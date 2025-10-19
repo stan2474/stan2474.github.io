@@ -3,7 +3,7 @@
 export function start(): void;
 export function convert_obj_to_filemesh(obj_data: Uint8Array, version: RobloxMeshVersion): Uint8Array;
 export function convert_filemesh_to_obj(filemesh_data: Uint8Array): Uint8Array;
-export function fix_place(input_bytes: Uint8Array, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection: boolean, force_xml_output: boolean, force_binary_output: boolean, folders_to_models: boolean, mappings_js: any, convert_assetid_to_url: boolean, asset_url_format: string): Uint8Array;
+export function fix_place(input_bytes: Uint8Array, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection: boolean, force_xml_output: boolean, force_binary_output: boolean, folders_to_models: boolean, mappings_js: any, convert_assetid_to_url: boolean, asset_url_format: string, convert_meshpart_to_specialmesh: boolean): Uint8Array;
 export enum RobloxMeshVersion {
   V1_00 = 0,
   V1_01 = 1,
@@ -19,7 +19,7 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly convert_obj_to_filemesh: (a: number, b: number, c: number) => [number, number, number, number];
   readonly convert_filemesh_to_obj: (a: number, b: number) => [number, number, number, number];
-  readonly fix_place: (a: number, b: number, c: number, d: number, e: number, f: number, g: any, h: number, i: number, j: number) => [number, number, number, number];
+  readonly fix_place: (a: number, b: number, c: number, d: number, e: number, f: number, g: any, h: number, i: number, j: number, k: number) => [number, number, number, number];
   readonly start: () => void;
   readonly rust_zstd_wasm_shim_qsort: (a: number, b: number, c: number, d: number) => void;
   readonly rust_zstd_wasm_shim_malloc: (a: number) => number;

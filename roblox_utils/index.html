@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="darkreader-lock">
 <title>roblox::utils</title>
 <style>
 body {
@@ -129,7 +128,7 @@ select {
 .back-link {
     display: inline-block;
     margin-bottom: 1em;
-    color: #88b;
+    color: #aaccff;
     text-decoration: none;
 }
 .back-link:hover {
@@ -167,6 +166,16 @@ select {
 }
 .mapping-controls button {
     margin-top: 0;
+}
+a {
+  color: #aaccff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+a:visited {
+  color: #e0b3ff;
 }
 </style>
 </head>
@@ -218,6 +227,12 @@ select {
       <label>
         <input type="checkbox" id="toggle-folders">
         convert folder instances into models
+      </label>
+    </div>
+    <div class="setting-item">
+      <label>
+        <input type="checkbox" id="toggle-meshparts">
+        convert meshparts into part + specialmesh
       </label>
     </div>
     <div class="setting-item">
@@ -388,6 +403,7 @@ const placeConverter = {
     convertBtn: document.getElementById('convertbtn-place'),
     statusText: document.getElementById('status-text-place'),
     toggleFolders: document.getElementById('toggle-folders'),
+    toggleMeshParts: document.getElementById('toggle-meshparts'),
     toggleXml: document.getElementById('toggle-xml'),
     toggleBinary: document.getElementById('toggle-binary'),
     toggleAssetIdToUrl: document.getElementById('toggle-assetid-to-url'),
@@ -541,6 +557,7 @@ const placeConverter = {
             const bytes = new Uint8Array(ab);
             
             const convertFolders = this.toggleFolders.checked;
+            const convertMeshParts = this.toggleMeshParts.checked;
             const instanceMappings = this.getInstanceMappings();
             const convertAssetIdToUrl = this.toggleAssetIdToUrl.checked;
             const assetUrlFormat = this.assetUrlFormatInput.value;
@@ -558,7 +575,8 @@ const placeConverter = {
                 convertFolders,
                 instanceMappings,
                 convertAssetIdToUrl,
-                assetUrlFormat
+                assetUrlFormat,
+                convertMeshParts
             );
 
             const shouldOutputXml = (isXml && !forceBinary) || forceXml;

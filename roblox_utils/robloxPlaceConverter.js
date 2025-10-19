@@ -240,14 +240,15 @@ export function convert_filemesh_to_obj(filemesh_data) {
  * @param {any} mappings_js
  * @param {boolean} convert_assetid_to_url
  * @param {string} asset_url_format
+ * @param {boolean} convert_meshpart_to_specialmesh
  * @returns {Uint8Array}
  */
-export function fix_place(input_bytes, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format) {
+export function fix_place(input_bytes, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format, convert_meshpart_to_specialmesh) {
     const ptr0 = passArray8ToWasm0(input_bytes, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passStringToWasm0(asset_url_format, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.fix_place(ptr0, len0, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1);
+    const ret = wasm.fix_place(ptr0, len0, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1, convert_meshpart_to_specialmesh);
     if (ret[3]) {
         throw takeFromExternrefTable0(ret[2]);
     }
