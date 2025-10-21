@@ -232,6 +232,23 @@ export function convert_filemesh_to_obj(filemesh_data) {
 }
 
 /**
+ * @param {Uint8Array} filemesh_data
+ * @param {RobloxMeshVersion} version
+ * @returns {Uint8Array}
+ */
+export function convert_filemesh_version(filemesh_data, version) {
+    const ptr0 = passArray8ToWasm0(filemesh_data, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.convert_filemesh_version(ptr0, len0, version);
+    if (ret[3]) {
+        throw takeFromExternrefTable0(ret[2]);
+    }
+    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v2;
+}
+
+/**
  * @param {Uint8Array} input_bytes
  * @param {boolean} is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection
  * @param {boolean} force_xml_output

@@ -189,6 +189,7 @@ a:visited {
   <button id="goto-place-converter">legacy_place::convert</button>
   <button id="goto-obj-to-mesh-converter">obj::to_roblox_mesh</button>
   <button id="goto-mesh-to-obj-converter">roblox_mesh::to_obj</button>
+  <button id="goto-mesh-version-converter">roblox_mesh::to_roblox_mesh</button>
 
   <hr>
 
@@ -342,6 +343,45 @@ a:visited {
       <div id="console-mesh-to-obj" class="console" tabindex="0"></div>
     </div>
   </div>
+
+  <div id="page-mesh-version-converter" style="display: none;">
+    <a href="#" class="back-link">&larr; back to home</a>
+    <h1>roblox_mesh::to_roblox_mesh</h1>
+    <p>a utility to upgrade or downgrade your mesh to any version</p>
+    
+    <div id="drop-mesh-version" class="drop-zone" tabindex="0">
+      <p id="drop-hint-mesh-version">drag & drop a .mesh file here, or click to choose.</p>
+      <p id="filename-mesh-version"></p>
+    </div>
+    
+    <input id="fileinput-mesh-version" type="file" accept=".mesh,application/octet-stream" style="display:none" />
+    <button id="choosebtn-mesh-version">choose file</button>
+    <button id="convertbtn-mesh-version" disabled>convert & download</button>
+    <p id="status-mesh-version">status: <span id="status-text-mesh-version" class="status-text">idle</span></p>
+  
+    <hr>
+  
+    <h2>settings</h2>
+    <div class="setting-item">
+      <label for="mesh-version-select-target">target mesh version:</label>
+      <select id="mesh-version-select-target">
+        <option value="v1.00">version 1.00</option>
+        <option value="v1.01">version 1.01</option>
+        <option value="v2.00" selected>version 2.00</option>
+        <option value="v3.00">version 3.00</option>
+        <option value="v4.00">version 4.00</option>
+        <option value="v5.00">version 5.00</option>
+      </select>
+    </div>
+  
+    <hr>
+  
+    <h2>console</h2>
+    <div class="console-window">
+      <div class="console-header"><span>output</span></div>
+      <div id="console-mesh-version" class="console" tabindex="0"></div>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -349,6 +389,7 @@ import initWasm, {
   fix_place,
   convert_obj_to_filemesh,
   convert_filemesh_to_obj,
+  convert_filemesh_version,
   RobloxMeshVersion
 } from './robloxPlaceConverter.js'; // this was originally gonna be just a place converter, but then I added mesh converters too
 
@@ -358,6 +399,7 @@ const backLinks = document.querySelectorAll('.back-link');
 const gotoPlaceBtn = document.getElementById('goto-place-converter');
 const gotoObjToMeshBtn = document.getElementById('goto-obj-to-mesh-converter');
 const gotoMeshToObjBtn = document.getElementById('goto-mesh-to-obj-converter');
+const gotoMeshVersionBtn = document.getElementById('goto-mesh-version-converter');
 
 let activeConsole = null;
 
@@ -373,6 +415,7 @@ function showPage(pageId) {
 gotoPlaceBtn.addEventListener('click', () => showPage('page-place-converter'));
 gotoObjToMeshBtn.addEventListener('click', () => showPage('page-obj-to-mesh-converter'));
 gotoMeshToObjBtn.addEventListener('click', () => showPage('page-mesh-to-obj-converter'));
+gotoMeshVersionBtn.addEventListener('click', () => showPage('page-mesh-version-converter'));
 
 backLinks.forEach(link => link.addEventListener('click', (e) => {
     e.preventDefault();
@@ -778,6 +821,99 @@ const meshToObjConverter = {
     }
 };
 
+const meshVersionConverter = {
+    dropHint: document.getElementById('drop-hint-mesh-version'),
+    filenameEl: document.getElementById('filename-mesh-version'),
+    drop: document.getElementById('drop-mesh-version'),
+    chooseBtn: document.getElementById('choosebtn-mesh-version'),
+    fileInput: document.getElementById('fileinput-mesh-version'),
+    convertBtn: document.getElementById('convertbtn-mesh-version'),
+    statusText: document.getElementById('status-text-mesh-version'),
+    versionSelect: document.getElementById('mesh-version-select-target'),
+    currentFile: null,
+
+    init() {
+        this.drop.addEventListener('click', ()=> this.fileInput.click());
+        this.chooseBtn.addEventListener('click', ()=> this.fileInput.click());
+        this.fileInput.addEventListener('change', (e)=> this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e)=>{ e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', ()=> this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e)=>{ e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', ()=> this.runConversion());
+    },
+
+    setFile(file) {
+        this.currentFile = file;
+        if (file) {
+            this.filenameEl.textContent = file.name;
+            this.dropHint.style.display = 'none';
+            this.convertBtn.disabled = false;
+            this.statusText.textContent = 'ready';
+            this.statusText.className = 'status-text ready';
+        } else {
+            this.filenameEl.textContent = '';
+            this.dropHint.style.display = 'block';
+            this.convertBtn.disabled = true;
+            this.statusText.textContent = 'idle';
+            this.statusText.className = 'status-text';
+        }
+    },
+
+    handleFileChange(e) {
+        const f = e.target.files && e.target.files[0];
+        if (f) this.setFile(f);
+    },
+
+    handleFileDrop(e) {
+        const f = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) this.setFile(f);
+    },
+
+    async runConversion() {
+        if (!this.currentFile) { alert('please select a file first'); return; }
+        activeConsole.innerHTML = '';
+        try {
+            this.statusText.textContent = 'reading file...';
+            this.statusText.className = 'status-text';
+            const ab = await this.currentFile.arrayBuffer();
+            const bytes = new Uint8Array(ab);
+            const versionString = this.versionSelect.value;
+
+            const versionMap = {
+                'v1.00': RobloxMeshVersion.V1_00,
+                'v1.01': RobloxMeshVersion.V1_01,
+                'v2.00': RobloxMeshVersion.V2_00,
+                'v3.00': RobloxMeshVersion.V3_00,
+                'v4.00': RobloxMeshVersion.V4_00,
+                'v5.00': RobloxMeshVersion.V5_00,
+            };
+            const wasmVersion = versionMap[versionString];
+
+            this.statusText.textContent = `converting to ${versionString}...`;
+
+            const out = convert_filemesh_version(bytes, wasmVersion);
+            const outname = this.currentFile.name.replace(/(\.mesh)?$/i, `_${versionString}.mesh`);
+
+            this.statusText.textContent = 'packaging...';
+            downloadFile(out, outname);
+
+            this.statusText.textContent = 'done!';
+            this.statusText.className = 'status-text ready';
+            setTimeout(() => {
+                if(this.statusText.textContent === 'done!') {
+                    this.statusText.textContent = 'ready';
+                    this.statusText.className = 'status-text ready';
+                }
+            }, 2000);
+        } catch(err) {
+            console.error('conversion error:', err);
+            this.statusText.textContent = 'error!';
+            this.statusText.className = 'status-text error';
+            alert('conversion error: ' + (err && err.message ? err.message : String(err)));
+        }
+    }
+};
+
 function downloadFile(data, filename) {
     const blob = (data instanceof Blob) ? data : new Blob([data], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
@@ -796,6 +932,7 @@ async function main() {
     placeConverter.init();
     objToMeshConverter.init();
     meshToObjConverter.init();
+    meshVersionConverter.init();
   } catch (err) {
     console.error("failed to initialize wasm module:", err);
     alert('fatal error loading core components.');
