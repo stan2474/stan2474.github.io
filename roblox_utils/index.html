@@ -177,6 +177,20 @@ a:hover {
 a:visited {
   color: #e0b3ff;
 }
+.experimental-tag {
+  color: #e57373;
+}
+.terrain-thingy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+}
+.terrain-thingy select {
+    width: 100%;
+    box-sizing: border-box;
+}
 </style>
 </head>
 <body>
@@ -253,6 +267,20 @@ a:visited {
         <input type="checkbox" id="toggle-assetid-to-url">
         convert rbxassetid:// to url
       </label>
+    </div>
+    <div class="setting-item">
+      <label>
+        <input type="checkbox" id="toggle-smooth-terrain">
+        convert smooth terrain to voxel terrain <span class="experimental-tag">[experimental]</span>
+      </label>
+    </div>
+    <div class="setting-item terrain-thingy" id="terrain-version-container" style="display: none; margin-left: 2em; border-left: 2px solid #333; padding-left: 1em;">
+      <label for="terrain-version-select">grid version: </label>
+      <select id="terrain-version-select">
+        <option value="V1">clustergrid (version 1, recommended for 2011L and clients that don't support v2)</option>
+        <option value="V2">clustergrid (version 2, recommended for 2012E - 2013E)</option>
+        <option value="V3" selected>clustergrid (version 3, recommended for 2013M+)</option>
+      </select>
     </div>
     <div class="setting-item" id="asset-url-format-container" style="display: none; margin-left: 2em;">
       <label for="asset-url-format-input">url: </label>
@@ -387,10 +415,12 @@ a:visited {
 <script type="module">
 import initWasm, {
   fix_place,
+  is_binary_rbxl,
   convert_obj_to_filemesh,
   convert_filemesh_to_obj,
   convert_filemesh_version,
-  RobloxMeshVersion
+  RobloxMeshVersion,
+  TerrainFormat
 } from './robloxPlaceConverter.js'; // this was originally gonna be just a place converter, but then I added mesh converters too
 
 atob('c3RhbiB3YXMgaGVyZQ==');
@@ -457,6 +487,9 @@ const placeConverter = {
     importConfigBtn: document.getElementById('import-config-btn'),
     exportConfigBtn: document.getElementById('export-config-btn'),
     importConfigInput: document.getElementById('import-config-input'),
+    toggleSmoothTerrain: document.getElementById('toggle-smooth-terrain'),
+    terrainVersionContainer: document.getElementById('terrain-version-container'),
+    terrainVersionSelect: document.getElementById('terrain-version-select'),
     currentFile: null,
 
     init() {
@@ -470,6 +503,10 @@ const placeConverter = {
         this.toggleAssetIdToUrl.addEventListener('change', () => {
             this.assetUrlFormatContainer.style.display = this.toggleAssetIdToUrl.checked ? 'block' : 'none';
         });
+        this.toggleSmoothTerrain.addEventListener('change', () => {
+            this.terrainVersionContainer.style.display = this.toggleSmoothTerrain.checked ? 'block' : 'none';
+        });
+
         this.addMappingBtn.addEventListener('click', () => this.addMappingRow());
         this.exportConfigBtn.addEventListener('click', () => this.handleExportConfig());
         this.importConfigBtn.addEventListener('click', () => this.importConfigInput.click());
@@ -604,8 +641,27 @@ const placeConverter = {
             const instanceMappings = this.getInstanceMappings();
             const convertAssetIdToUrl = this.toggleAssetIdToUrl.checked;
             const assetUrlFormat = this.assetUrlFormatInput.value;
-            const forceXml = this.toggleXml.checked;
-            const forceBinary = this.toggleBinary.checked;
+            let forceXml = this.toggleXml.checked;
+            let forceBinary = this.toggleBinary.checked;
+            const convertSmoothTerrain = this.toggleSmoothTerrain.checked;
+            const terrainVersion = this.terrainVersionSelect.value;
+            const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
+            
+            const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
+            if (convertSmoothTerrain && willExportBinary && (terrainVersion === 'V1' || terrainVersion === 'V2')) {
+                const response = confirm("smooth -> voxel terrain for clustergrid version 1 & 2 does not work on binary format output.\n\ndo you want to switch output to xml?");
+                if (response) {
+                    forceXml = true;
+                    forceBinary = false;
+                    this.toggleXml.checked = true;
+                    this.toggleBinary.checked = false;
+                } else {
+                    this.statusText.textContent = 'cancelled';
+                    this.statusText.className = 'status-text';
+                    return;
+                }
+            }
+            
             const isXml = this.currentFile.name.toLowerCase().endsWith('.rbxlx');
             
             this.statusText.textContent = 'processing...';
@@ -619,7 +675,9 @@ const placeConverter = {
                 instanceMappings,
                 convertAssetIdToUrl,
                 assetUrlFormat,
-                convertMeshParts
+                convertMeshParts,
+                convertSmoothTerrain,
+                TerrainFormat[`ClusterGrid${terrainVersion}`]
             );
 
             const shouldOutputXml = (isXml && !forceBinary) || forceXml;

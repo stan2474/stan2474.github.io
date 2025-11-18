@@ -249,8 +249,19 @@ export function convert_filemesh_version(filemesh_data, version) {
 }
 
 /**
+ * @param {Uint8Array} bytes
+ * @returns {boolean}
+ */
+export function is_binary_rbxl(bytes) {
+    const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.is_binary_rbxl(ptr0, len0);
+    return ret !== 0;
+}
+
+/**
  * @param {Uint8Array} input_bytes
- * @param {boolean} is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection
+ * @param {boolean} _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection
  * @param {boolean} force_xml_output
  * @param {boolean} force_binary_output
  * @param {boolean} folders_to_models
@@ -258,14 +269,16 @@ export function convert_filemesh_version(filemesh_data, version) {
  * @param {boolean} convert_assetid_to_url
  * @param {string} asset_url_format
  * @param {boolean} convert_meshpart_to_specialmesh
+ * @param {boolean} smooth_to_voxel
+ * @param {TerrainFormat} smooth_terrain_format
  * @returns {Uint8Array}
  */
-export function fix_place(input_bytes, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format, convert_meshpart_to_specialmesh) {
+export function fix_place(input_bytes, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format) {
     const ptr0 = passArray8ToWasm0(input_bytes, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passStringToWasm0(asset_url_format, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.fix_place(ptr0, len0, is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1, convert_meshpart_to_specialmesh);
+    const ret = wasm.fix_place(ptr0, len0, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format);
     if (ret[3]) {
         throw takeFromExternrefTable0(ret[2]);
     }
@@ -284,6 +297,14 @@ export const RobloxMeshVersion = Object.freeze({
     V3_00: 3, "3": "V3_00",
     V4_00: 4, "4": "V4_00",
     V5_00: 5, "5": "V5_00",
+});
+/**
+ * @enum {0 | 1 | 2}
+ */
+export const TerrainFormat = Object.freeze({
+    ClusterGrid: 0, "0": "ClusterGrid",
+    ClusterGridV2: 1, "1": "ClusterGridV2",
+    ClusterGridV3: 2, "2": "ClusterGridV3",
 });
 
 const EXPECTED_RESPONSE_TYPES = new Set(['basic', 'cors', 'default']);
