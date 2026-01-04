@@ -302,7 +302,7 @@ export const RobloxMeshVersion = Object.freeze({
  * @enum {0 | 1 | 2}
  */
 export const TerrainFormat = Object.freeze({
-    ClusterGrid: 0, "0": "ClusterGrid",
+    ClusterGridV1: 0, "0": "ClusterGridV1",
     ClusterGridV2: 1, "1": "ClusterGridV2",
     ClusterGridV3: 2, "2": "ClusterGridV3",
 });

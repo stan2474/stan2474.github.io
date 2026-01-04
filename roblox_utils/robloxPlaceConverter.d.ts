@@ -15,7 +15,7 @@ export enum RobloxMeshVersion {
   V5_00 = 5,
 }
 export enum TerrainFormat {
-  ClusterGrid = 0,
+  ClusterGridV1 = 0,
   ClusterGridV2 = 1,
   ClusterGridV3 = 2,
 }
