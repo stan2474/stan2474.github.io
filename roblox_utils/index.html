@@ -1,563 +1,638 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>roblox::utils</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<style>
-body {
-  font-family: "Courier New", Courier, monospace;
-  background-color: #121212;
-  color: #e0e0e0;
-  line-height: 1.6;
-  margin: 0;
-  padding: 2em;
-}
-.container {
-  max-width: 760px;
-  margin: 0 auto;
-}
-h1, h2 {
-  font-weight: normal;
-  border-bottom: 1px solid #444;
-  padding-bottom: 0.3em;
-  margin-top: 1.5em;
-  margin-bottom: 1em;
-}
-hr {
-  border: none;
-  border-top: 1px solid #444;
-  margin: 2em 0;
-}
-.drop-zone {
-  border: 2px dashed #444;
-  padding: 3em;
-  text-align: center;
-  cursor: pointer;
-  margin-bottom: 1em;
-  transition: border-color 0.2s, background-color 0.2s;
-}
-.drop-zone.dragover {
-  border-color: #888;
-  background-color: #1a1a1a;
-}
-button, .btn {
-  font-family: inherit;
-  font-size: 1em;
-  padding: 0.5em 1em;
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #555;
-  cursor: pointer;
-  margin-right: 0.5em;
-  margin-top: 0.5em;
-}
-button:hover, .btn:hover {
-  background-color: #333;
-  border-color: #777;
-}
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #2a2a2a;
-  border-color: #555;
-}
-.status-text.ready {
-  color: #81c784;
-}
-.status-text.error {
-  color: #e57373;
-}
-.console-window {
-  background-color: #0d0d0d;
-  border: 1px solid #444;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.console-header {
-  background-color: #2a2a2a;
-  padding: 4px 8px;
-  font-size: 0.8em;
-  color: #aaa;
-  border-bottom: 1px solid #444;
-  text-transform: lowercase;
-}
-.console {
-  width: 100%;
-  box-sizing: border-box;
-  height: 220px;
-  font-family: "Courier New", monospace;
-  font-size: 0.9em;
-  color: #ccc;
-  padding: 0.5em;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.log-entry {
-  margin-bottom: 2px;
-}
-input[type="checkbox"], select {
-  vertical-align: middle;
-  margin-right: 0.5em;
-}
-input[type="text"] {
-    font-family: inherit;
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    border: 1px solid #444;
-    padding: 0.4em;
-    font-size: 0.9em;
-}
-select {
-    font-family: inherit;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    border: 1px solid #555;
-    padding: 0.3em;
-}
-.setting-item {
-  margin-bottom: 0.5em;
-}
-.footer {
-  margin-top: 2em;
-  font-size: 0.9em;
-  color: #777;
-  text-align: center;
-}
-.back-link {
-    display: inline-block;
-    margin-bottom: 1em;
-    color: #aaccff;
-    text-decoration: none;
-}
-.back-link:hover {
-    text-decoration: underline;
-}
-.mapping-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    margin-bottom: 0.5em;
-}
-.mapping-item input[type="text"] {
-    flex: 1;
-}
-.mapping-item span {
-    color: #888;
-}
-.remove-mapping-btn {
-    padding: 0.2em 0.6em;
-    font-size: 1.2em;
-    line-height: 1;
-    background-color: #3a2a2a;
-    border-color: #755;
-}
-.remove-mapping-btn:hover {
-    background-color: #5a2a2a;
-    border-color: #a55;
-    color: #fdd;
-}
-.mapping-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    margin-top: 1em;
-}
-.mapping-controls button {
-    margin-top: 0;
-}
-a {
-  color: #aaccff;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-a:visited {
-  color: #e0b3ff;
-}
-.experimental-tag {
-  color: #e57373;
-}
-.terrain-thingy {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3em;
-    margin-top: 0.5em;
-    margin-bottom: 1em;
-}
-.terrain-thingy select {
-    width: 100%;
-    box-sizing: border-box;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>roblox::utils</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #121212;
+      color: #e0e0e0;
+      line-height: 1.6;
+      margin: 0;
+      padding: 2em;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    h1,
+    h2 {
+      font-weight: normal;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.3em;
+      margin-top: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+
+    .drop-zone {
+      border: 2px dashed #444;
+      padding: 3em;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 1em;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .drop-zone.dragover {
+      border-color: #888;
+      background-color: #1a1a1a;
+    }
+
+    button,
+    .btn {
+      font-family: inherit;
+      font-size: 1em;
+      padding: 0.5em 1em;
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      cursor: pointer;
+      margin-right: 0.5em;
+      margin-top: 0.5em;
+    }
+
+    button:hover,
+    .btn:hover {
+      background-color: #333;
+      border-color: #777;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #2a2a2a;
+      border-color: #555;
+    }
+
+    .status-text.ready {
+      color: #81c784;
+    }
+
+    .status-text.error {
+      color: #e57373;
+    }
+
+    .console-window {
+      background-color: #0d0d0d;
+      border: 1px solid #444;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .console-header {
+      background-color: #2a2a2a;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      color: #aaa;
+      border-bottom: 1px solid #444;
+      text-transform: lowercase;
+    }
+
+    .console {
+      width: 100%;
+      box-sizing: border-box;
+      height: 220px;
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      color: #ccc;
+      padding: 0.5em;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-entry {
+      margin-bottom: 2px;
+    }
+
+    input[type="checkbox"],
+    select {
+      vertical-align: middle;
+      margin-right: 0.5em;
+    }
+
+    input[type="text"] {
+      font-family: inherit;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      padding: 0.4em;
+      font-size: 0.9em;
+    }
+
+    select {
+      font-family: inherit;
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.3em;
+    }
+
+    .setting-item {
+      margin-bottom: 0.5em;
+    }
+
+    .footer {
+      margin-top: 2em;
+      font-size: 0.9em;
+      color: #777;
+      text-align: center;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1em;
+      color: #aaccff;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .mapping-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .mapping-item input[type="text"] {
+      flex: 1;
+    }
+
+    .mapping-item span {
+      color: #888;
+    }
+
+    .remove-mapping-btn {
+      padding: 0.2em 0.6em;
+      font-size: 1.2em;
+      line-height: 1;
+      background-color: #3a2a2a;
+      border-color: #755;
+    }
+
+    .remove-mapping-btn:hover {
+      background-color: #5a2a2a;
+      border-color: #a55;
+      color: #fdd;
+    }
+
+    .mapping-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-top: 1em;
+    }
+
+    .mapping-controls button {
+      margin-top: 0;
+    }
+
+    a {
+      color: #aaccff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    a:visited {
+      color: #e0b3ff;
+    }
+
+    .experimental-tag {
+      color: #e57373;
+    }
+
+    .terrain-thingy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3em;
+      margin-top: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    .terrain-thingy select {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="container">
+  <div class="container">
 
-<div id="page-home">
-  <h1>roblox::utils</h1>
-  <p>choose a utility to use.</p>
-  <button id="goto-place-converter">legacy_place::convert</button>
-  <button id="goto-obj-to-mesh-converter">obj::to_roblox_mesh</button>
-  <button id="goto-mesh-to-obj-converter">roblox_mesh::to_obj</button>
-  <button id="goto-mesh-version-converter">roblox_mesh::to_roblox_mesh</button>
+    <div id="page-home">
+      <h1>roblox::utils</h1>
+      <p>choose a utility to use.</p>
+      <button id="goto-place-converter">legacy_place::convert</button>
+      <button id="goto-obj-to-mesh-converter">obj::to_roblox_mesh</button>
+      <button id="goto-mesh-to-obj-converter">roblox_mesh::to_obj</button>
+      <button id="goto-mesh-version-converter">roblox_mesh::to_roblox_mesh</button>
 
-  <hr>
+      <hr>
 
-  <h2>credits</h2>
-  <ul>
-    <li>
-      <strong>legacy_place::convert</strong> uses <a href="https://github.com/rojo-rbx/rbx-dom" target="_blank" rel="noopener noreferrer">rbx-binary and rbx_xml</a> 
-      (from rbx-dom) for roblox place file conversion.
-    </li>
-    <li>
-      <strong>obj::to_roblox_mesh / roblox_mesh::to_obj</strong> is based on 
-      <a href="https://devforum.roblox.com/t/roblox-filemesh-format-specification/326114/" target="_blank" rel="noopener noreferrer">maximumadhd's roblox mesh file format documentation</a>.
-    </li>
-  </ul>
-</div>
-
-  <div id="page-place-converter" style="display: none;">
-    <a href="#" class="back-link">&larr; back to home</a>
-    <h1>legacy_place::convert</h1>
-    <p>a utility to make modern roblox places work on legacy roblox clients</p>
-    
-    <div id="drop-place" class="drop-zone" tabindex="0">
-      <p id="drop-hint-place">drag & drop a .rbxl or .rbxlx file here, or click to choose multiple files.</p>
-      <p id="filename-place"></p>
-    </div>
-    
-    <input id="fileinput-place" type="file" accept=".rbxl,.rbxlx" multiple style="display:none" />
-    <button id="choosebtn-place">choose files</button>
-    <button id="convertbtn-place" disabled>convert & download</button>
-    <p id="status-place">status: <span id="status-text-place" class="status-text">idle</span></p>
-  
-    <hr>
-  
-    <h2>settings</h2>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-folders">
-        convert folder instances into models
-      </label>
-    </div>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-meshparts">
-        convert meshparts into part + specialmesh
-      </label>
-    </div>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-xml">
-        force export to xml (.rbxlx)
-      </label>
-    </div>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-binary">
-        force export to binary (.rbxl)
-      </label>
-    </div>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-assetid-to-url">
-        convert rbxassetid:// to url
-      </label>
-    </div>
-    <div class="setting-item">
-      <label>
-        <input type="checkbox" id="toggle-smooth-terrain">
-        convert smooth terrain to voxel terrain <span class="experimental-tag">[experimental]</span>
-      </label>
-    </div>
-    <div class="setting-item terrain-thingy" id="terrain-version-container" style="display: none; margin-left: 2em; border-left: 2px solid #333; padding-left: 1em;">
-      <label for="terrain-version-select">grid version: </label>
-      <select id="terrain-version-select">
-        <option value="V1">clustergrid (version 1, recommended for 2011L and clients that don't support v2)</option>
-        <option value="V2">clustergrid (version 2, recommended for 2012E - 2013E)</option>
-        <option value="V3" selected>clustergrid (version 3, recommended for 2013M+)</option>
-      </select>
-    </div>
-    <div class="setting-item" id="asset-url-format-container" style="display: none; margin-left: 2em;">
-      <label for="asset-url-format-input">url: </label>
-      <input type="text" id="asset-url-format-input" value="http://www.roblox.com/asset/?id=" size="40">
+      <h2>credits</h2>
+      <ul>
+        <li>
+          <strong>legacy_place::convert</strong> uses <a href="https://github.com/rojo-rbx/rbx-dom" target="_blank"
+            rel="noopener noreferrer">rbx-binary and rbx_xml</a>
+          (from rbx-dom) for roblox place file conversion.
+        </li>
+        <li>
+          <strong>obj::to_roblox_mesh / roblox_mesh::to_obj</strong> is based on
+          <a href="https://devforum.roblox.com/t/roblox-filemesh-format-specification/326114/" target="_blank"
+            rel="noopener noreferrer">maximumadhd's roblox mesh file format documentation</a>.
+        </li>
+      </ul>
     </div>
 
-    <hr>
+    <div id="page-place-converter" style="display: none;">
+      <a href="#" class="back-link">&larr; back to home</a>
+      <h1>legacy_place::convert</h1>
+      <p>a utility to make modern roblox places work on legacy roblox clients</p>
 
-    <h2>instance mapping</h2>
-    <p>replace specific instance classnames with others. (e.g., "Folder" &rarr; "Model")</p>
-    <div id="instance-mappings-list">
-    </div>
-    <div class="mapping-controls">
+      <div id="drop-place" class="drop-zone" tabindex="0">
+        <p id="drop-hint-place">drag & drop a .rbxl or .rbxlx file here, or click to choose multiple files.</p>
+        <p id="filename-place"></p>
+      </div>
+
+      <input id="fileinput-place" type="file" accept=".rbxl,.rbxlx" multiple style="display:none" />
+      <button id="choosebtn-place">choose files</button>
+      <button id="convertbtn-place" disabled>convert & download</button>
+      <p id="status-place">status: <span id="status-text-place" class="status-text">idle</span></p>
+
+      <hr>
+
+      <h2>settings</h2>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-folders">
+          convert folder instances into models
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-meshparts">
+          convert meshparts into part + specialmesh
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-xml">
+          force export to xml (.rbxlx)
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-binary">
+          force export to binary (.rbxl)
+        </label>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-assetid-to-url">
+          convert rbxassetid:// to url
+        </label>
+      </div>
+      <div class="setting-item" id="asset-url-format-container" style="display: none; margin-left: 2em;">
+        <label for="asset-url-format-input">url: </label>
+        <input type="text" id="asset-url-format-input" value="http://www.roblox.com/asset/?id=" size="40">
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-smooth-terrain">
+          convert smooth terrain to voxel terrain <span class="experimental-tag">[experimental]</span>
+        </label>
+      </div>
+      <div class="setting-item terrain-thingy" id="terrain-version-container"
+        style="display: none; margin-left: 2em; border-left: 2px solid #333; padding-left: 1em;">
+        <label for="terrain-version-select">grid version: </label>
+        <select id="terrain-version-select">
+          <option value="V1">clustergrid (version 1, recommended for 2011L and clients that don't support v2)</option>
+          <option value="V2">clustergrid (version 2, recommended for 2012E - 2013E)</option>
+          <option value="V3" selected>clustergrid (version 3, recommended for 2013M+)</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-downgrade-voxel">
+          modify existing voxel terrain's version <span class="experimental-tag">[experimental]</span>
+        </label>
+      </div>
+      <div class="setting-item terrain-thingy" id="voxel-version-container"
+        style="display: none; margin-left: 2em; border-left: 2px solid #333; padding-left: 1em;">
+        <label for="voxel-version-select">target grid version: </label>
+        <select id="voxel-version-select">
+          <option value="V1">clustergrid (version 1, recommended for 2011L and clients that don't support v2)</option>
+          <option value="V2" selected>clustergrid (version 2, recommended for 2012E - 2013E)</option>
+          <option value="V3">clustergrid (version 3, recommended for 2013M+)</option>
+        </select>
+      </div>
+
+
+      <hr>
+
+      <h2>instance mapping</h2>
+      <p>replace specific instance classnames with others. (e.g., "Folder" &rarr; "Model")</p>
+      <div id="instance-mappings-list">
+      </div>
+      <div class="mapping-controls">
         <button id="add-mapping-btn">+ add mapping</button>
         <button id="import-config-btn">import config</button>
         <button id="export-config-btn">export config</button>
         <input type="file" id="import-config-input" accept=".json" style="display:none;" />
+      </div>
+
+      <hr>
+
+      <h2>console</h2>
+      <div class="console-window">
+        <div class="console-header"><span>output</span></div>
+        <div id="console-place" class="console" tabindex="0"></div>
+      </div>
     </div>
-  
-    <hr>
-  
-    <h2>console</h2>
-    <div class="console-window">
-      <div class="console-header"><span>output</span></div>
-      <div id="console-place" class="console" tabindex="0"></div>
+
+    <div id="page-obj-to-mesh-converter" style="display: none;">
+      <a href="#" class="back-link">&larr; back to home</a>
+      <h1>obj::to_roblox_mesh</h1>
+      <p>a utility to convert .obj files to roblox's mesh format</p>
+
+      <div id="drop-obj-to-mesh" class="drop-zone" tabindex="0">
+        <p id="drop-hint-obj-to-mesh">drag & drop a .obj file here, or click to choose multiple files.</p>
+        <p id="filename-obj-to-mesh"></p>
+      </div>
+
+      <input id="fileinput-obj-to-mesh" type="file" accept=".obj" multiple style="display:none" />
+      <button id="choosebtn-obj-to-mesh">choose file</button>
+      <button id="convertbtn-obj-to-mesh" disabled>convert & download</button>
+      <p id="status-obj-to-mesh">status: <span id="status-text-obj-to-mesh" class="status-text">idle</span></p>
+
+      <hr>
+
+      <h2>settings</h2>
+      <div class="setting-item">
+        <label for="mesh-version-select">target mesh version:</label>
+        <select id="mesh-version-select">
+          <option value="v1.00">version 1.00</option>
+          <option value="v1.01">version 1.01</option>
+          <option value="v2.00" selected>version 2.00</option>
+          <option value="v3.00">version 3.00</option>
+          <option value="v4.00">version 4.00</option>
+          <option value="v5.00">version 5.00</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <h2>console</h2>
+      <div class="console-window">
+        <div class="console-header"><span>output</span></div>
+        <div id="console-obj-to-mesh" class="console" tabindex="0"></div>
+      </div>
+    </div>
+
+    <div id="page-mesh-to-obj-converter" style="display: none;">
+      <a href="#" class="back-link">&larr; back to home</a>
+      <h1>roblox_mesh::to_obj</h1>
+      <p>a utility to convert roblox's mesh format back to .obj</p>
+
+      <div id="drop-mesh-to-obj" class="drop-zone" tabindex="0">
+        <p id="drop-hint-mesh-to-obj">drag & drop a .mesh file here, or click to choose multiple files.</p>
+        <p id="filename-mesh-to-obj"></p>
+      </div>
+
+      <input id="fileinput-mesh-to-obj" type="file" accept=".mesh,application/octet-stream" multiple
+        style="display:none" />
+      <button id="choosebtn-mesh-to-obj">choose files</button>
+      <button id="convertbtn-mesh-to-obj" disabled>convert & download</button>
+      <p id="status-mesh-to-obj">status: <span id="status-text-mesh-to-obj" class="status-text">idle</span></p>
+
+      <hr>
+
+      <h2>console</h2>
+      <div class="console-window">
+        <div class="console-header"><span>output</span></div>
+        <div id="console-mesh-to-obj" class="console" tabindex="0"></div>
+      </div>
+    </div>
+
+    <div id="page-mesh-version-converter" style="display: none;">
+      <a href="#" class="back-link">&larr; back to home</a>
+      <h1>roblox_mesh::to_roblox_mesh</h1>
+      <p>a utility to upgrade or downgrade your mesh to any version</p>
+
+      <div id="drop-mesh-version" class="drop-zone" tabindex="0">
+        <p id="drop-hint-mesh-version">drag & drop a .mesh file here, or click to choose multiple files.</p>
+        <p id="filename-mesh-version"></p>
+      </div>
+
+      <input id="fileinput-mesh-version" type="file" accept=".mesh,application/octet-stream" multiple
+        style="display:none" />
+      <button id="choosebtn-mesh-version">choose files</button>
+      <button id="convertbtn-mesh-version" disabled>convert & download</button>
+      <p id="status-mesh-version">status: <span id="status-text-mesh-version" class="status-text">idle</span></p>
+
+      <hr>
+
+      <h2>settings</h2>
+      <div class="setting-item">
+        <label for="mesh-version-select-target">target mesh version:</label>
+        <select id="mesh-version-select-target">
+          <option value="v1.00">version 1.00</option>
+          <option value="v1.01">version 1.01</option>
+          <option value="v2.00" selected>version 2.00</option>
+          <option value="v3.00">version 3.00</option>
+          <option value="v4.00">version 4.00</option>
+          <option value="v5.00">version 5.00</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <h2>console</h2>
+      <div class="console-window">
+        <div class="console-header"><span>output</span></div>
+        <div id="console-mesh-version" class="console" tabindex="0"></div>
+      </div>
     </div>
   </div>
 
-  <div id="page-obj-to-mesh-converter" style="display: none;">
-    <a href="#" class="back-link">&larr; back to home</a>
-    <h1>obj::to_roblox_mesh</h1>
-    <p>a utility to convert .obj files to roblox's mesh format</p>
-    
-    <div id="drop-obj-to-mesh" class="drop-zone" tabindex="0">
-      <p id="drop-hint-obj-to-mesh">drag & drop a .obj file here, or click to choose multiple files.</p>
-      <p id="filename-obj-to-mesh"></p>
-    </div>
-    
-    <input id="fileinput-obj-to-mesh" type="file" accept=".obj" multiple style="display:none" />
-    <button id="choosebtn-obj-to-mesh">choose file</button>
-    <button id="convertbtn-obj-to-mesh" disabled>convert & download</button>
-    <p id="status-obj-to-mesh">status: <span id="status-text-obj-to-mesh" class="status-text">idle</span></p>
-  
-    <hr>
-  
-    <h2>settings</h2>
-    <div class="setting-item">
-      <label for="mesh-version-select">target mesh version:</label>
-      <select id="mesh-version-select">
-        <option value="v1.00">version 1.00</option>
-        <option value="v1.01">version 1.01</option>
-        <option value="v2.00" selected>version 2.00</option>
-        <option value="v3.00">version 3.00</option>
-        <option value="v4.00">version 4.00</option>
-        <option value="v5.00">version 5.00</option>
-      </select>
-    </div>
-  
-    <hr>
-  
-    <h2>console</h2>
-    <div class="console-window">
-      <div class="console-header"><span>output</span></div>
-      <div id="console-obj-to-mesh" class="console" tabindex="0"></div>
-    </div>
-  </div>
-  
-  <div id="page-mesh-to-obj-converter" style="display: none;">
-    <a href="#" class="back-link">&larr; back to home</a>
-    <h1>roblox_mesh::to_obj</h1>
-    <p>a utility to convert roblox's mesh format back to .obj</p>
-    
-    <div id="drop-mesh-to-obj" class="drop-zone" tabindex="0">
-      <p id="drop-hint-mesh-to-obj">drag & drop a .mesh file here, or click to choose multiple files.</p>
-      <p id="filename-mesh-to-obj"></p>
-    </div>
-    
-    <input id="fileinput-mesh-to-obj" type="file" accept=".mesh,application/octet-stream" multiple style="display:none" />
-    <button id="choosebtn-mesh-to-obj">choose files</button>
-    <button id="convertbtn-mesh-to-obj" disabled>convert & download</button>
-    <p id="status-mesh-to-obj">status: <span id="status-text-mesh-to-obj" class="status-text">idle</span></p>
-  
-    <hr>
-  
-    <h2>console</h2>
-    <div class="console-window">
-      <div class="console-header"><span>output</span></div>
-      <div id="console-mesh-to-obj" class="console" tabindex="0"></div>
-    </div>
-  </div>
+  <script type="module">
+    import initWasm, {
+      fix_place,
+      is_binary_rbxl,
+      convert_obj_to_filemesh,
+      convert_filemesh_to_obj,
+      convert_filemesh_version,
+      RobloxMeshVersion,
+      TerrainFormat
+    } from './robloxPlaceConverter.js'; // this was originally gonna be just a place converter, but then I added mesh converters too
 
-  <div id="page-mesh-version-converter" style="display: none;">
-    <a href="#" class="back-link">&larr; back to home</a>
-    <h1>roblox_mesh::to_roblox_mesh</h1>
-    <p>a utility to upgrade or downgrade your mesh to any version</p>
-    
-    <div id="drop-mesh-version" class="drop-zone" tabindex="0">
-      <p id="drop-hint-mesh-version">drag & drop a .mesh file here, or click to choose multiple files.</p>
-      <p id="filename-mesh-version"></p>
-    </div>
-    
-    <input id="fileinput-mesh-version" type="file" accept=".mesh,application/octet-stream" multiple style="display:none" />
-    <button id="choosebtn-mesh-version">choose files</button>
-    <button id="convertbtn-mesh-version" disabled>convert & download</button>
-    <p id="status-mesh-version">status: <span id="status-text-mesh-version" class="status-text">idle</span></p>
-  
-    <hr>
-  
-    <h2>settings</h2>
-    <div class="setting-item">
-      <label for="mesh-version-select-target">target mesh version:</label>
-      <select id="mesh-version-select-target">
-        <option value="v1.00">version 1.00</option>
-        <option value="v1.01">version 1.01</option>
-        <option value="v2.00" selected>version 2.00</option>
-        <option value="v3.00">version 3.00</option>
-        <option value="v4.00">version 4.00</option>
-        <option value="v5.00">version 5.00</option>
-      </select>
-    </div>
-  
-    <hr>
-  
-    <h2>console</h2>
-    <div class="console-window">
-      <div class="console-header"><span>output</span></div>
-      <div id="console-mesh-version" class="console" tabindex="0"></div>
-    </div>
-  </div>
-</div>
+    atob('c3RhbiB3YXMgaGVyZQ==');
+    const pages = document.querySelectorAll('.container > div');
+    const backLinks = document.querySelectorAll('.back-link');
+    const gotoPlaceBtn = document.getElementById('goto-place-converter');
+    const gotoObjToMeshBtn = document.getElementById('goto-obj-to-mesh-converter');
+    const gotoMeshToObjBtn = document.getElementById('goto-mesh-to-obj-converter');
+    const gotoMeshVersionBtn = document.getElementById('goto-mesh-version-converter');
 
-<script type="module">
-import initWasm, {
-  fix_place,
-  is_binary_rbxl,
-  convert_obj_to_filemesh,
-  convert_filemesh_to_obj,
-  convert_filemesh_version,
-  RobloxMeshVersion,
-  TerrainFormat
-} from './robloxPlaceConverter.js'; // this was originally gonna be just a place converter, but then I added mesh converters too
+    let activeConsole = null;
 
-atob('c3RhbiB3YXMgaGVyZQ==');
-const pages = document.querySelectorAll('.container > div');
-const backLinks = document.querySelectorAll('.back-link');
-const gotoPlaceBtn = document.getElementById('goto-place-converter');
-const gotoObjToMeshBtn = document.getElementById('goto-obj-to-mesh-converter');
-const gotoMeshToObjBtn = document.getElementById('goto-mesh-to-obj-converter');
-const gotoMeshVersionBtn = document.getElementById('goto-mesh-version-converter');
-
-let activeConsole = null;
-
-function showPage(pageId) {
-    pages.forEach(p => p.style.display = 'none');
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
+    function showPage(pageId) {
+      pages.forEach(p => p.style.display = 'none');
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) {
         targetPage.style.display = 'block';
         activeConsole = targetPage.querySelector('.console');
+      }
     }
-}
 
-gotoPlaceBtn.addEventListener('click', () => showPage('page-place-converter'));
-gotoObjToMeshBtn.addEventListener('click', () => showPage('page-obj-to-mesh-converter'));
-gotoMeshToObjBtn.addEventListener('click', () => showPage('page-mesh-to-obj-converter'));
-gotoMeshVersionBtn.addEventListener('click', () => showPage('page-mesh-version-converter'));
+    gotoPlaceBtn.addEventListener('click', () => showPage('page-place-converter'));
+    gotoObjToMeshBtn.addEventListener('click', () => showPage('page-obj-to-mesh-converter'));
+    gotoMeshToObjBtn.addEventListener('click', () => showPage('page-mesh-to-obj-converter'));
+    gotoMeshVersionBtn.addEventListener('click', () => showPage('page-mesh-version-converter'));
 
-backLinks.forEach(link => link.addEventListener('click', (e) => {
-    e.preventDefault();
-    showPage('page-home');
-}));
+    backLinks.forEach(link => link.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPage('page-home');
+    }));
 
-function appendConsole(msg){
-  if (!activeConsole) return;
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  const textContent = typeof msg === 'string' ? msg : JSON.stringify(msg);
-  entry.textContent = `> ${textContent}`;
-  activeConsole.appendChild(entry);
-  activeConsole.scrollTop = activeConsole.scrollHeight;
-}
+    function appendConsole(msg) {
+      if (!activeConsole) return;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const textContent = typeof msg === 'string' ? msg : JSON.stringify(msg);
+      entry.textContent = `> ${textContent}`;
+      activeConsole.appendChild(entry);
+      activeConsole.scrollTop = activeConsole.scrollHeight;
+    }
 
-const origConsole = { log: console.log.bind(console), warn: console.warn.bind(console), error: console.error.bind(console) };
-console.log = function(...a){ origConsole.log(...a); a.forEach(x=>appendConsole(x)) };
-console.warn = function(...a){ origConsole.warn(...a); a.forEach(x=>appendConsole(x)) };
-console.error = function(...a){ origConsole.error(...a); a.forEach(x=>appendConsole(x)) };
+    const origConsole = { log: console.log.bind(console), warn: console.warn.bind(console), error: console.error.bind(console) };
+    console.log = function (...a) { origConsole.log(...a); a.forEach(x => appendConsole(x)) };
+    console.warn = function (...a) { origConsole.warn(...a); a.forEach(x => appendConsole(x)) };
+    console.error = function (...a) { origConsole.error(...a); a.forEach(x => appendConsole(x)) };
 
-const placeConverter = {
-    dropHint: document.getElementById('drop-hint-place'),
-    filenameEl: document.getElementById('filename-place'),
-    drop: document.getElementById('drop-place'),
-    chooseBtn: document.getElementById('choosebtn-place'),
-    fileInput: document.getElementById('fileinput-place'),
-    convertBtn: document.getElementById('convertbtn-place'),
-    statusText: document.getElementById('status-text-place'),
-    toggleFolders: document.getElementById('toggle-folders'),
-    toggleMeshParts: document.getElementById('toggle-meshparts'),
-    toggleXml: document.getElementById('toggle-xml'),
-    toggleBinary: document.getElementById('toggle-binary'),
-    toggleAssetIdToUrl: document.getElementById('toggle-assetid-to-url'),
-    assetUrlFormatContainer: document.getElementById('asset-url-format-container'),
-    assetUrlFormatInput: document.getElementById('asset-url-format-input'),
-    mappingsList: document.getElementById('instance-mappings-list'),
-    addMappingBtn: document.getElementById('add-mapping-btn'),
-    importConfigBtn: document.getElementById('import-config-btn'),
-    exportConfigBtn: document.getElementById('export-config-btn'),
-    importConfigInput: document.getElementById('import-config-input'),
-    toggleSmoothTerrain: document.getElementById('toggle-smooth-terrain'),
-    terrainVersionContainer: document.getElementById('terrain-version-container'),
-    terrainVersionSelect: document.getElementById('terrain-version-select'),
-    currentFile: null,
-    currentFiles: [],
+    const placeConverter = {
+      dropHint: document.getElementById('drop-hint-place'),
+      filenameEl: document.getElementById('filename-place'),
+      drop: document.getElementById('drop-place'),
+      chooseBtn: document.getElementById('choosebtn-place'),
+      fileInput: document.getElementById('fileinput-place'),
+      convertBtn: document.getElementById('convertbtn-place'),
+      statusText: document.getElementById('status-text-place'),
+      toggleFolders: document.getElementById('toggle-folders'),
+      toggleMeshParts: document.getElementById('toggle-meshparts'),
+      toggleXml: document.getElementById('toggle-xml'),
+      toggleBinary: document.getElementById('toggle-binary'),
+      toggleAssetIdToUrl: document.getElementById('toggle-assetid-to-url'),
+      assetUrlFormatContainer: document.getElementById('asset-url-format-container'),
+      assetUrlFormatInput: document.getElementById('asset-url-format-input'),
+      mappingsList: document.getElementById('instance-mappings-list'),
+      addMappingBtn: document.getElementById('add-mapping-btn'),
+      importConfigBtn: document.getElementById('import-config-btn'),
+      exportConfigBtn: document.getElementById('export-config-btn'),
+      importConfigInput: document.getElementById('import-config-input'),
+      toggleSmoothTerrain: document.getElementById('toggle-smooth-terrain'),
+      terrainVersionContainer: document.getElementById('terrain-version-container'),
+      terrainVersionSelect: document.getElementById('terrain-version-select'),
+      toggleDowngradeVoxel: document.getElementById('toggle-downgrade-voxel'),
+      voxelVersionContainer: document.getElementById('voxel-version-container'),
+      voxelVersionSelect: document.getElementById('voxel-version-select'),
+      currentFile: null,
+      currentFiles: [],
 
-    init() {
-        this.drop.addEventListener('click', ()=> this.fileInput.click());
-        this.chooseBtn.addEventListener('click', ()=> this.fileInput.click());
-        this.fileInput.addEventListener('change', (e)=> this.handleFileChange(e));
-        this.drop.addEventListener('dragover', (e)=>{ e.preventDefault(); this.drop.classList.add('dragover'); });
-        this.drop.addEventListener('dragleave', ()=> this.drop.classList.remove('dragover'));
-        this.drop.addEventListener('drop', (e)=>{ e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
-        this.convertBtn.addEventListener('click', ()=> this.runConversion());
+      init() {
+        this.drop.addEventListener('click', () => this.fileInput.click());
+        this.chooseBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e) => { e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', () => this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e) => { e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', () => this.runConversion());
         this.toggleAssetIdToUrl.addEventListener('change', () => {
-            this.assetUrlFormatContainer.style.display = this.toggleAssetIdToUrl.checked ? 'block' : 'none';
+          this.assetUrlFormatContainer.style.display = this.toggleAssetIdToUrl.checked ? 'block' : 'none';
         });
         this.toggleSmoothTerrain.addEventListener('change', () => {
-            this.terrainVersionContainer.style.display = this.toggleSmoothTerrain.checked ? 'block' : 'none';
+          if (this.toggleSmoothTerrain.checked) {
+            this.toggleDowngradeVoxel.checked = false;
+            this.voxelVersionContainer.style.display = 'none';
+          }
+          this.terrainVersionContainer.style.display = this.toggleSmoothTerrain.checked ? 'block' : 'none';
+        });
+        this.toggleDowngradeVoxel.addEventListener('change', () => {
+          if (this.toggleDowngradeVoxel.checked) {
+            this.toggleSmoothTerrain.checked = false;
+            this.terrainVersionContainer.style.display = 'none';
+          }
+          this.voxelVersionContainer.style.display = this.toggleDowngradeVoxel.checked ? 'block' : 'none';
         });
 
         this.addMappingBtn.addEventListener('click', () => this.addMappingRow());
         this.exportConfigBtn.addEventListener('click', () => this.handleExportConfig());
         this.importConfigBtn.addEventListener('click', () => this.importConfigInput.click());
         this.importConfigInput.addEventListener('change', (e) => this.handleImportConfig(e));
-    },
+      },
 
-    handleExportConfig() {
+      handleExportConfig() {
         const config = {
-            instanceMappings: this.getInstanceMappings(),
+          instanceMappings: this.getInstanceMappings(),
         };
         const jsonString = JSON.stringify(config, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         downloadFile(blob, 'instance-mappings.json');
         console.log("instance mappings exported.");
-    },
+      },
 
-    handleImportConfig(event) {
+      handleImportConfig(event) {
         const file = event.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            try {
-                const config = JSON.parse(e.target.result);
-                this.applyConfig(config);
-                console.log("instance mappings imported successfully.");
-            } catch (err) {
-                console.error("failed to parse config file:", err);
-                alert('invalid or corrupt configuration file.');
-            }
+          try {
+            const config = JSON.parse(e.target.result);
+            this.applyConfig(config);
+            console.log("instance mappings imported successfully.");
+          } catch (err) {
+            console.error("failed to parse config file:", err);
+            alert('invalid or corrupt configuration file.');
+          }
         };
         reader.readAsText(file);
         event.target.value = '';
-    },
-    
-    applyConfig(config) {
+      },
+
+      applyConfig(config) {
         this.mappingsList.innerHTML = '';
         const mappings = config.instanceMappings || config;
 
         if (mappings && typeof mappings === 'object') {
-            for (const [from, to] of Object.entries(mappings)) {
-                this.addMappingRow(from, to);
-            }
+          for (const [from, to] of Object.entries(mappings)) {
+            this.addMappingRow(from, to);
+          }
         } else {
-            console.warn("imported config is not a valid mapping object.");
+          console.warn("imported config is not a valid mapping object.");
         }
-    },
+      },
 
-    addMappingRow(from = '', to = '') {
+      addMappingRow(from = '', to = '') {
         const item = document.createElement('div');
         item.className = 'mapping-item';
 
@@ -579,553 +654,568 @@ const placeConverter = {
         removeBtn.innerHTML = '&times;';
         removeBtn.title = 'remove mapping';
         removeBtn.onclick = () => item.remove();
-        
+
         item.appendChild(fromInput);
         item.appendChild(arrow);
         item.appendChild(toInput);
         item.appendChild(removeBtn);
 
         this.mappingsList.appendChild(item);
-    },
-    
-    getInstanceMappings() {
+      },
+
+      getInstanceMappings() {
         const mappings = {};
         const items = this.mappingsList.querySelectorAll('.mapping-item');
         items.forEach(item => {
-            const inputs = item.querySelectorAll('input[type="text"]');
-            const from = inputs[0].value.trim();
-            const to = inputs[1].value.trim();
-            if (from && to) {
-                mappings[from] = to;
-            }
+          const inputs = item.querySelectorAll('input[type="text"]');
+          const from = inputs[0].value.trim();
+          const to = inputs[1].value.trim();
+          if (from && to) {
+            mappings[from] = to;
+          }
         });
         return mappings;
-    },
+      },
 
-    setFile(files) {
+      setFile(files) {
         if (files && files.length > 0) {
-            this.currentFiles = Array.from(files);
-            this.currentFile = this.currentFiles[0];
-            
-            if (this.currentFiles.length > 1) {
-                this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
-            } else {
-                this.filenameEl.textContent = this.currentFile.name;
-            }
-            
-            this.dropHint.style.display = 'none';
-            this.convertBtn.disabled = false;
-            this.statusText.textContent = 'ready';
-            this.statusText.className = 'status-text ready';
-        } else {
-            this.currentFiles = [];
-            this.currentFile = null;
-            this.filenameEl.textContent = '';
-            this.dropHint.style.display = 'block';
-            this.convertBtn.disabled = true;
-            this.statusText.textContent = 'idle';
-            this.statusText.className = 'status-text';
-        }
-    },
+          this.currentFiles = Array.from(files);
+          this.currentFile = this.currentFiles[0];
 
-    handleFileChange(e) {
+          if (this.currentFiles.length > 1) {
+            this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+          } else {
+            this.filenameEl.textContent = this.currentFile.name;
+          }
+
+          this.dropHint.style.display = 'none';
+          this.convertBtn.disabled = false;
+          this.statusText.textContent = 'ready';
+          this.statusText.className = 'status-text ready';
+        } else {
+          this.currentFiles = [];
+          this.currentFile = null;
+          this.filenameEl.textContent = '';
+          this.dropHint.style.display = 'block';
+          this.convertBtn.disabled = true;
+          this.statusText.textContent = 'idle';
+          this.statusText.className = 'status-text';
+        }
+      },
+
+      handleFileChange(e) {
         const f = e.target.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    handleFileDrop(e) {
+      handleFileDrop(e) {
         const f = e.dataTransfer.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    async runConversion() {
+      async runConversion() {
         if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
         activeConsole.innerHTML = '';
-        
+
         let useZip = this.currentFiles.length > 1;
         let zip = null;
         if (useZip) {
-            zip = new JSZip();
+          zip = new JSZip();
         }
 
         this.statusText.textContent = 'processing...';
         this.statusText.className = 'status-text';
-        
-        try {
-            for (let i = 0; i < this.currentFiles.length; i++) {
-                const file = this.currentFiles[i];
-                if(useZip) this.statusText.textContent = `processing ${i+1}/${this.currentFiles.length}...`;
-
-                const ab = await file.arrayBuffer();
-                const bytes = new Uint8Array(ab);
-                
-                const convertFolders = this.toggleFolders.checked;
-                const convertMeshParts = this.toggleMeshParts.checked;
-                const instanceMappings = this.getInstanceMappings();
-                const convertAssetIdToUrl = this.toggleAssetIdToUrl.checked;
-                const assetUrlFormat = this.assetUrlFormatInput.value;
-                let forceXml = this.toggleXml.checked;
-                let forceBinary = this.toggleBinary.checked;
-                const convertSmoothTerrain = this.toggleSmoothTerrain.checked;
-                const terrainVersion = this.terrainVersionSelect.value;
-                const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
-                
-                const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
-                if (convertSmoothTerrain && willExportBinary && (terrainVersion === 'V1' || terrainVersion === 'V2')) {
-                    const response = confirm(`file: ${file.name}\nsmooth -> voxel terrain for clustergrid version 1 & 2 does not work on binary format output.\n\ndo you want to switch output to xml?`);
-                    if (response) {
-                        forceXml = true;
-                        forceBinary = false;
-                    } else {
-                        if (useZip) {
-                            console.log(`skipped ${file.name}`);
-                            continue;
-                        } else {
-                            this.statusText.textContent = 'cancelled';
-                            this.statusText.className = 'status-text';
-                            return;
-                        }
-                    }
-                }
-                
-                const isXml = file.name.toLowerCase().endsWith('.rbxlx');
-                const out = fix_place(
-                    bytes,
-                    isXml,
-                    forceXml,
-                    forceBinary,
-                    convertFolders,
-                    instanceMappings,
-                    convertAssetIdToUrl,
-                    assetUrlFormat,
-                    convertMeshParts,
-                    convertSmoothTerrain,
-                    TerrainFormat[`ClusterGrid${terrainVersion}`]
-                );
-
-                const shouldOutputXml = (isXml && !forceBinary) || forceXml;
-                const outname = shouldOutputXml 
-                    ? file.name.replace(/\.rbxlx?$/i, '_fixed.rbxlx')
-                    : file.name.replace(/\.rbxlx?$/i, '_fixed.rbxl');
-
-                if (useZip) {
-                    zip.file(outname, out);
-                } else {
-                    this.statusText.textContent = 'packaging...';
-                    downloadFile(out, outname);
-                }
-            }
-            
-            if (useZip) {
-                this.statusText.textContent = 'zipping...';
-                const zipContent = await zip.generateAsync({type:"blob"});
-                downloadFile(zipContent, "converted_places.zip");
-            }
-
-            this.statusText.textContent = 'done!';
-            this.statusText.className = 'status-text ready';
-            setTimeout(() => {
-                if(this.statusText.textContent === 'done!') {
-                    this.statusText.textContent = 'ready';
-                    this.statusText.className = 'status-text ready';
-                }
-            }, 2000);
-
-        } catch(err) {
-            console.error('conversion error:', err);
-            this.statusText.textContent = 'error!';
-            this.statusText.className = 'status-text error';
-            alert('conversion error: ' + (err && err.message ? err.message : String(err)));
-        }
-    }
-};
-
-const objToMeshConverter = {
-    dropHint: document.getElementById('drop-hint-obj-to-mesh'),
-    filenameEl: document.getElementById('filename-obj-to-mesh'),
-    drop: document.getElementById('drop-obj-to-mesh'),
-    chooseBtn: document.getElementById('choosebtn-obj-to-mesh'),
-    fileInput: document.getElementById('fileinput-obj-to-mesh'),
-    convertBtn: document.getElementById('convertbtn-obj-to-mesh'),
-    statusText: document.getElementById('status-text-obj-to-mesh'),
-    versionSelect: document.getElementById('mesh-version-select'),
-    currentFile: null,
-    currentFiles: [],
-
-    init() {
-        this.drop.addEventListener('click', ()=> this.fileInput.click());
-        this.chooseBtn.addEventListener('click', ()=> this.fileInput.click());
-        this.fileInput.addEventListener('change', (e)=> this.handleFileChange(e));
-        this.drop.addEventListener('dragover', (e)=>{ e.preventDefault(); this.drop.classList.add('dragover'); });
-        this.drop.addEventListener('dragleave', ()=> this.drop.classList.remove('dragover'));
-        this.drop.addEventListener('drop', (e)=>{ e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
-        this.convertBtn.addEventListener('click', ()=> this.runConversion());
-    },
-
-    setFile(files) {
-        if (files && files.length > 0) {
-            this.currentFiles = Array.from(files);
-            this.currentFile = this.currentFiles[0];
-            
-            if (this.currentFiles.length > 1) {
-                this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
-            } else {
-                this.filenameEl.textContent = this.currentFile.name;
-            }
-            
-            this.dropHint.style.display = 'none';
-            this.convertBtn.disabled = false;
-            this.statusText.textContent = 'ready';
-            this.statusText.className = 'status-text ready';
-        } else {
-            this.currentFiles = [];
-            this.currentFile = null;
-            this.filenameEl.textContent = '';
-            this.dropHint.style.display = 'block';
-            this.convertBtn.disabled = true;
-            this.statusText.textContent = 'idle';
-            this.statusText.className = 'status-text';
-        }
-    },
-
-    handleFileChange(e) {
-        const f = e.target.files;
-        if (f) this.setFile(f);
-    },
-
-    handleFileDrop(e) {
-        const f = e.dataTransfer.files;
-        if (f) this.setFile(f);
-    },
-
-    async runConversion() {
-        if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
-        activeConsole.innerHTML = '';
-        
-        let useZip = this.currentFiles.length > 1;
-        let zip = null;
-        if (useZip) {
-            zip = new JSZip();
-        }
 
         try {
-            const versionString = this.versionSelect.value;
-            const versionMap = {
-                'v1.00': RobloxMeshVersion.V1_00,
-                'v1.01': RobloxMeshVersion.V1_01,
-                'v2.00': RobloxMeshVersion.V2_00,
-                'v3.00': RobloxMeshVersion.V3_00,
-                'v4.00': RobloxMeshVersion.V4_00,
-                'v5.00': RobloxMeshVersion.V5_00,
-            };
-            const wasmVersion = versionMap[versionString];
-            
-            this.statusText.textContent = `processing with ${versionString}...`;
-            this.statusText.className = 'status-text';
-            
-            for (let i = 0; i < this.currentFiles.length; i++) {
-                const file = this.currentFiles[i];
-                if(useZip) this.statusText.textContent = `processing ${i+1}/${this.currentFiles.length}...`;
-                
-                const ab = await file.arrayBuffer();
-                const bytes = new Uint8Array(ab);
-                
-                const out = convert_obj_to_filemesh(bytes, wasmVersion);
-                const outname = file.name.replace(/\.obj$/i, '.mesh');
+          for (let i = 0; i < this.currentFiles.length; i++) {
+            const file = this.currentFiles[i];
+            if (useZip) this.statusText.textContent = `processing ${i + 1}/${this.currentFiles.length}...`;
 
+            const ab = await file.arrayBuffer();
+            const bytes = new Uint8Array(ab);
+
+            const convertFolders = this.toggleFolders.checked;
+            const convertMeshParts = this.toggleMeshParts.checked;
+            const instanceMappings = this.getInstanceMappings();
+            const convertAssetIdToUrl = this.toggleAssetIdToUrl.checked;
+            const assetUrlFormat = this.assetUrlFormatInput.value;
+            let forceXml = this.toggleXml.checked;
+            let forceBinary = this.toggleBinary.checked;
+            const convertSmoothTerrain = this.toggleSmoothTerrain.checked;
+            const toggleDowngradeVoxel = this.toggleDowngradeVoxel.checked;
+            const terrainVersion = this.terrainVersionSelect.value;
+            const voxelVersion = this.voxelVersionSelect.value;
+            const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
+
+            const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
+
+            let activeVersion = null;
+            if (convertSmoothTerrain) activeVersion = terrainVersion;
+            else if (toggleDowngradeVoxel) activeVersion = voxelVersion;
+
+            if (activeVersion && willExportBinary && (activeVersion === 'V1' || activeVersion === 'V2')) {
+              let msgType = "smooth -> voxel terrain";
+              if (toggleDowngradeVoxel && !convertSmoothTerrain) {
+                msgType = "voxel terrain version change";
+              }
+              const prefix = useZip ? `file: ${file.name}\n` : '';
+              const response = confirm(`${prefix}${msgType} for clustergrid version 1 & 2 does not work on binary format output.\n\ndo you want to switch output to xml?`);
+              if (response) {
+                forceXml = true;
+                forceBinary = false;
+              } else {
                 if (useZip) {
-                    zip.file(outname, out);
+                  console.log(`skipped ${file.name}`);
+                  continue;
                 } else {
-                    this.statusText.textContent = 'packaging...';
-                    downloadFile(out, outname);
+                  this.statusText.textContent = 'cancelled';
+                  this.statusText.className = 'status-text';
+                  return;
                 }
+              }
             }
-            
+
+            const isXml = file.name.toLowerCase().endsWith('.rbxlx');
+            const out = fix_place(
+              bytes,
+              isXml,
+              forceXml,
+              forceBinary,
+              convertFolders,
+              instanceMappings,
+              convertAssetIdToUrl,
+              assetUrlFormat,
+              convertMeshParts,
+              convertSmoothTerrain,
+              TerrainFormat[`ClusterGrid${terrainVersion}`],
+              toggleDowngradeVoxel,
+              TerrainFormat[`ClusterGrid${this.voxelVersionSelect.value}`]
+            );
+
+            const shouldOutputXml = (isXml && !forceBinary) || forceXml;
+            const outname = shouldOutputXml
+              ? file.name.replace(/\.rbxlx?$/i, '_fixed.rbxlx')
+              : file.name.replace(/\.rbxlx?$/i, '_fixed.rbxl');
+
             if (useZip) {
-                this.statusText.textContent = 'zipping...';
-                const zipContent = await zip.generateAsync({type:"blob"});
-                downloadFile(zipContent, "converted_meshes.zip");
-            }
-
-            this.statusText.textContent = 'done!';
-            this.statusText.className = 'status-text ready';
-            setTimeout(() => {
-                if(this.statusText.textContent === 'done!') {
-                    this.statusText.textContent = 'ready';
-                    this.statusText.className = 'status-text ready';
-                }
-            }, 2000);
-        } catch(err) {
-            console.error('conversion error:', err);
-            this.statusText.textContent = 'error!';
-            this.statusText.className = 'status-text error';
-            alert('conversion error: ' + (err && err.message ? err.message : String(err)));
-        }
-    }
-};
-
-const meshToObjConverter = {
-    dropHint: document.getElementById('drop-hint-mesh-to-obj'),
-    filenameEl: document.getElementById('filename-mesh-to-obj'),
-    drop: document.getElementById('drop-mesh-to-obj'),
-    chooseBtn: document.getElementById('choosebtn-mesh-to-obj'),
-    fileInput: document.getElementById('fileinput-mesh-to-obj'),
-    convertBtn: document.getElementById('convertbtn-mesh-to-obj'),
-    statusText: document.getElementById('status-text-mesh-to-obj'),
-    currentFile: null,
-    currentFiles: [],
-
-    init() {
-        this.drop.addEventListener('click', ()=> this.fileInput.click());
-        this.chooseBtn.addEventListener('click', ()=> this.fileInput.click());
-        this.fileInput.addEventListener('change', (e)=> this.handleFileChange(e));
-        this.drop.addEventListener('dragover', (e)=>{ e.preventDefault(); this.drop.classList.add('dragover'); });
-        this.drop.addEventListener('dragleave', ()=> this.drop.classList.remove('dragover'));
-        this.drop.addEventListener('drop', (e)=>{ e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
-        this.convertBtn.addEventListener('click', ()=> this.runConversion());
-    },
-
-    setFile(files) {
-        if (files && files.length > 0) {
-            this.currentFiles = Array.from(files);
-            this.currentFile = this.currentFiles[0];
-            
-            if (this.currentFiles.length > 1) {
-                this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+              zip.file(outname, out);
             } else {
-                this.filenameEl.textContent = this.currentFile.name;
+              this.statusText.textContent = 'packaging...';
+              downloadFile(out, outname);
             }
-            
-            this.dropHint.style.display = 'none';
-            this.convertBtn.disabled = false;
-            this.statusText.textContent = 'ready';
-            this.statusText.className = 'status-text ready';
-        } else {
-            this.currentFiles = [];
-            this.currentFile = null;
-            this.filenameEl.textContent = '';
-            this.dropHint.style.display = 'block';
-            this.convertBtn.disabled = true;
-            this.statusText.textContent = 'idle';
-            this.statusText.className = 'status-text';
+          }
+
+          if (useZip) {
+            this.statusText.textContent = 'zipping...';
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            downloadFile(zipContent, "converted_places.zip");
+          }
+
+          this.statusText.textContent = 'done!';
+          this.statusText.className = 'status-text ready';
+          setTimeout(() => {
+            if (this.statusText.textContent === 'done!') {
+              this.statusText.textContent = 'ready';
+              this.statusText.className = 'status-text ready';
+            }
+          }, 2000);
+
+        } catch (err) {
+          console.error('conversion error:', err);
+          this.statusText.textContent = 'error!';
+          this.statusText.className = 'status-text error';
+          alert('conversion error: ' + (err && err.message ? err.message : String(err)));
         }
-    },
-    
-    handleFileChange(e) {
+      }
+    };
+
+    const objToMeshConverter = {
+      dropHint: document.getElementById('drop-hint-obj-to-mesh'),
+      filenameEl: document.getElementById('filename-obj-to-mesh'),
+      drop: document.getElementById('drop-obj-to-mesh'),
+      chooseBtn: document.getElementById('choosebtn-obj-to-mesh'),
+      fileInput: document.getElementById('fileinput-obj-to-mesh'),
+      convertBtn: document.getElementById('convertbtn-obj-to-mesh'),
+      statusText: document.getElementById('status-text-obj-to-mesh'),
+      versionSelect: document.getElementById('mesh-version-select'),
+      currentFile: null,
+      currentFiles: [],
+
+      init() {
+        this.drop.addEventListener('click', () => this.fileInput.click());
+        this.chooseBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e) => { e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', () => this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e) => { e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', () => this.runConversion());
+      },
+
+      setFile(files) {
+        if (files && files.length > 0) {
+          this.currentFiles = Array.from(files);
+          this.currentFile = this.currentFiles[0];
+
+          if (this.currentFiles.length > 1) {
+            this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+          } else {
+            this.filenameEl.textContent = this.currentFile.name;
+          }
+
+          this.dropHint.style.display = 'none';
+          this.convertBtn.disabled = false;
+          this.statusText.textContent = 'ready';
+          this.statusText.className = 'status-text ready';
+        } else {
+          this.currentFiles = [];
+          this.currentFile = null;
+          this.filenameEl.textContent = '';
+          this.dropHint.style.display = 'block';
+          this.convertBtn.disabled = true;
+          this.statusText.textContent = 'idle';
+          this.statusText.className = 'status-text';
+        }
+      },
+
+      handleFileChange(e) {
         const f = e.target.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    handleFileDrop(e) {
+      handleFileDrop(e) {
         const f = e.dataTransfer.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    async runConversion() {
+      async runConversion() {
         if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
         activeConsole.innerHTML = '';
 
         let useZip = this.currentFiles.length > 1;
         let zip = null;
         if (useZip) {
-            zip = new JSZip();
+          zip = new JSZip();
         }
 
         try {
-            this.statusText.textContent = 'processing...';
-            this.statusText.className = 'status-text';
-            
-            for (let i = 0; i < this.currentFiles.length; i++) {
-                const file = this.currentFiles[i];
-                if(useZip) this.statusText.textContent = `processing ${i+1}/${this.currentFiles.length}...`;
-                
-                const ab = await file.arrayBuffer();
-                const bytes = new Uint8Array(ab);
-                
-                const out = convert_filemesh_to_obj(bytes);
-                const outname = file.name.replace(/\.mesh$/i, '.obj');
+          const versionString = this.versionSelect.value;
+          const versionMap = {
+            'v1.00': RobloxMeshVersion.V1_00,
+            'v1.01': RobloxMeshVersion.V1_01,
+            'v2.00': RobloxMeshVersion.V2_00,
+            'v3.00': RobloxMeshVersion.V3_00,
+            'v4.00': RobloxMeshVersion.V4_00,
+            'v5.00': RobloxMeshVersion.V5_00,
+          };
+          const wasmVersion = versionMap[versionString];
 
-                if (useZip) {
-                    zip.file(outname, out);
-                } else {
-                    this.statusText.textContent = 'packaging...';
-                    downloadFile(out, outname);
-                }
-            }
+          this.statusText.textContent = `processing with ${versionString}...`;
+          this.statusText.className = 'status-text';
+
+          for (let i = 0; i < this.currentFiles.length; i++) {
+            const file = this.currentFiles[i];
+            if (useZip) this.statusText.textContent = `processing ${i + 1}/${this.currentFiles.length}...`;
+
+            const ab = await file.arrayBuffer();
+            const bytes = new Uint8Array(ab);
+
+            const out = convert_obj_to_filemesh(bytes, wasmVersion);
+            const outname = file.name.replace(/\.obj$/i, '.mesh');
 
             if (useZip) {
-                this.statusText.textContent = 'zipping...';
-                const zipContent = await zip.generateAsync({type:"blob"});
-                downloadFile(zipContent, "converted_objs.zip");
-            }
-
-            this.statusText.textContent = 'done!';
-            this.statusText.className = 'status-text ready';
-            setTimeout(() => {
-                if(this.statusText.textContent === 'done!') {
-                    this.statusText.textContent = 'ready';
-                    this.statusText.className = 'status-text ready';
-                }
-            }, 2000);
-        } catch(err) {
-            console.error('conversion error:', err);
-            this.statusText.textContent = 'error!';
-            this.statusText.className = 'status-text error';
-            alert('conversion error: ' + (err && err.message ? err.message : String(err)));
-        }
-    }
-};
-
-const meshVersionConverter = {
-    dropHint: document.getElementById('drop-hint-mesh-version'),
-    filenameEl: document.getElementById('filename-mesh-version'),
-    drop: document.getElementById('drop-mesh-version'),
-    chooseBtn: document.getElementById('choosebtn-mesh-version'),
-    fileInput: document.getElementById('fileinput-mesh-version'),
-    convertBtn: document.getElementById('convertbtn-mesh-version'),
-    statusText: document.getElementById('status-text-mesh-version'),
-    versionSelect: document.getElementById('mesh-version-select-target'),
-    currentFile: null,
-    currentFiles: [],
-
-    init() {
-        this.drop.addEventListener('click', ()=> this.fileInput.click());
-        this.chooseBtn.addEventListener('click', ()=> this.fileInput.click());
-        this.fileInput.addEventListener('change', (e)=> this.handleFileChange(e));
-        this.drop.addEventListener('dragover', (e)=>{ e.preventDefault(); this.drop.classList.add('dragover'); });
-        this.drop.addEventListener('dragleave', ()=> this.drop.classList.remove('dragover'));
-        this.drop.addEventListener('drop', (e)=>{ e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
-        this.convertBtn.addEventListener('click', ()=> this.runConversion());
-    },
-
-    setFile(files) {
-        if (files && files.length > 0) {
-            this.currentFiles = Array.from(files);
-            this.currentFile = this.currentFiles[0];
-            
-            if (this.currentFiles.length > 1) {
-                this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+              zip.file(outname, out);
             } else {
-                this.filenameEl.textContent = this.currentFile.name;
+              this.statusText.textContent = 'packaging...';
+              downloadFile(out, outname);
             }
-            
-            this.dropHint.style.display = 'none';
-            this.convertBtn.disabled = false;
-            this.statusText.textContent = 'ready';
-            this.statusText.className = 'status-text ready';
-        } else {
-            this.currentFiles = [];
-            this.currentFile = null;
-            this.filenameEl.textContent = '';
-            this.dropHint.style.display = 'block';
-            this.convertBtn.disabled = true;
-            this.statusText.textContent = 'idle';
-            this.statusText.className = 'status-text';
-        }
-    },
+          }
 
-    handleFileChange(e) {
+          if (useZip) {
+            this.statusText.textContent = 'zipping...';
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            downloadFile(zipContent, "converted_meshes.zip");
+          }
+
+          this.statusText.textContent = 'done!';
+          this.statusText.className = 'status-text ready';
+          setTimeout(() => {
+            if (this.statusText.textContent === 'done!') {
+              this.statusText.textContent = 'ready';
+              this.statusText.className = 'status-text ready';
+            }
+          }, 2000);
+        } catch (err) {
+          console.error('conversion error:', err);
+          this.statusText.textContent = 'error!';
+          this.statusText.className = 'status-text error';
+          alert('conversion error: ' + (err && err.message ? err.message : String(err)));
+        }
+      }
+    };
+
+    const meshToObjConverter = {
+      dropHint: document.getElementById('drop-hint-mesh-to-obj'),
+      filenameEl: document.getElementById('filename-mesh-to-obj'),
+      drop: document.getElementById('drop-mesh-to-obj'),
+      chooseBtn: document.getElementById('choosebtn-mesh-to-obj'),
+      fileInput: document.getElementById('fileinput-mesh-to-obj'),
+      convertBtn: document.getElementById('convertbtn-mesh-to-obj'),
+      statusText: document.getElementById('status-text-mesh-to-obj'),
+      currentFile: null,
+      currentFiles: [],
+
+      init() {
+        this.drop.addEventListener('click', () => this.fileInput.click());
+        this.chooseBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e) => { e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', () => this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e) => { e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', () => this.runConversion());
+      },
+
+      setFile(files) {
+        if (files && files.length > 0) {
+          this.currentFiles = Array.from(files);
+          this.currentFile = this.currentFiles[0];
+
+          if (this.currentFiles.length > 1) {
+            this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+          } else {
+            this.filenameEl.textContent = this.currentFile.name;
+          }
+
+          this.dropHint.style.display = 'none';
+          this.convertBtn.disabled = false;
+          this.statusText.textContent = 'ready';
+          this.statusText.className = 'status-text ready';
+        } else {
+          this.currentFiles = [];
+          this.currentFile = null;
+          this.filenameEl.textContent = '';
+          this.dropHint.style.display = 'block';
+          this.convertBtn.disabled = true;
+          this.statusText.textContent = 'idle';
+          this.statusText.className = 'status-text';
+        }
+      },
+
+      handleFileChange(e) {
         const f = e.target.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    handleFileDrop(e) {
+      handleFileDrop(e) {
         const f = e.dataTransfer.files;
         if (f) this.setFile(f);
-    },
+      },
 
-    async runConversion() {
+      async runConversion() {
         if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
         activeConsole.innerHTML = '';
-        
+
         let useZip = this.currentFiles.length > 1;
         let zip = null;
         if (useZip) {
-            zip = new JSZip();
+          zip = new JSZip();
         }
 
         try {
-            const versionString = this.versionSelect.value;
-            const versionMap = {
-                'v1.00': RobloxMeshVersion.V1_00,
-                'v1.01': RobloxMeshVersion.V1_01,
-                'v2.00': RobloxMeshVersion.V2_00,
-                'v3.00': RobloxMeshVersion.V3_00,
-                'v4.00': RobloxMeshVersion.V4_00,
-                'v5.00': RobloxMeshVersion.V5_00,
-            };
-            const wasmVersion = versionMap[versionString];
+          this.statusText.textContent = 'processing...';
+          this.statusText.className = 'status-text';
 
-            this.statusText.textContent = `converting to ${versionString}...`;
-            this.statusText.className = 'status-text';
+          for (let i = 0; i < this.currentFiles.length; i++) {
+            const file = this.currentFiles[i];
+            if (useZip) this.statusText.textContent = `processing ${i + 1}/${this.currentFiles.length}...`;
 
-            for (let i = 0; i < this.currentFiles.length; i++) {
-                const file = this.currentFiles[i];
-                if(useZip) this.statusText.textContent = `processing ${i+1}/${this.currentFiles.length}...`;
-                
-                const ab = await file.arrayBuffer();
-                const bytes = new Uint8Array(ab);
+            const ab = await file.arrayBuffer();
+            const bytes = new Uint8Array(ab);
 
-                const out = convert_filemesh_version(bytes, wasmVersion);
-                const outname = file.name.replace(/(\.mesh)?$/i, `_${versionString}.mesh`);
+            const out = convert_filemesh_to_obj(bytes);
+            const outname = file.name.replace(/\.mesh$/i, '.obj');
 
-                if (useZip) {
-                    zip.file(outname, out);
-                } else {
-                    this.statusText.textContent = 'packaging...';
-                    downloadFile(out, outname);
-                }
-            }
-            
             if (useZip) {
-                this.statusText.textContent = 'zipping...';
-                const zipContent = await zip.generateAsync({type:"blob"});
-                downloadFile(zipContent, "converted_mesh_versions.zip");
+              zip.file(outname, out);
+            } else {
+              this.statusText.textContent = 'packaging...';
+              downloadFile(out, outname);
             }
+          }
 
-            this.statusText.textContent = 'done!';
-            this.statusText.className = 'status-text ready';
-            setTimeout(() => {
-                if(this.statusText.textContent === 'done!') {
-                    this.statusText.textContent = 'ready';
-                    this.statusText.className = 'status-text ready';
-                }
-            }, 2000);
-        } catch(err) {
-            console.error('conversion error:', err);
-            this.statusText.textContent = 'error!';
-            this.statusText.className = 'status-text error';
-            alert('conversion error: ' + (err && err.message ? err.message : String(err)));
+          if (useZip) {
+            this.statusText.textContent = 'zipping...';
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            downloadFile(zipContent, "converted_objs.zip");
+          }
+
+          this.statusText.textContent = 'done!';
+          this.statusText.className = 'status-text ready';
+          setTimeout(() => {
+            if (this.statusText.textContent === 'done!') {
+              this.statusText.textContent = 'ready';
+              this.statusText.className = 'status-text ready';
+            }
+          }, 2000);
+        } catch (err) {
+          console.error('conversion error:', err);
+          this.statusText.textContent = 'error!';
+          this.statusText.className = 'status-text error';
+          alert('conversion error: ' + (err && err.message ? err.message : String(err)));
         }
+      }
+    };
+
+    const meshVersionConverter = {
+      dropHint: document.getElementById('drop-hint-mesh-version'),
+      filenameEl: document.getElementById('filename-mesh-version'),
+      drop: document.getElementById('drop-mesh-version'),
+      chooseBtn: document.getElementById('choosebtn-mesh-version'),
+      fileInput: document.getElementById('fileinput-mesh-version'),
+      convertBtn: document.getElementById('convertbtn-mesh-version'),
+      statusText: document.getElementById('status-text-mesh-version'),
+      versionSelect: document.getElementById('mesh-version-select-target'),
+      currentFile: null,
+      currentFiles: [],
+
+      init() {
+        this.drop.addEventListener('click', () => this.fileInput.click());
+        this.chooseBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e) => { e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', () => this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e) => { e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', () => this.runConversion());
+      },
+
+      setFile(files) {
+        if (files && files.length > 0) {
+          this.currentFiles = Array.from(files);
+          this.currentFile = this.currentFiles[0];
+
+          if (this.currentFiles.length > 1) {
+            this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+          } else {
+            this.filenameEl.textContent = this.currentFile.name;
+          }
+
+          this.dropHint.style.display = 'none';
+          this.convertBtn.disabled = false;
+          this.statusText.textContent = 'ready';
+          this.statusText.className = 'status-text ready';
+        } else {
+          this.currentFiles = [];
+          this.currentFile = null;
+          this.filenameEl.textContent = '';
+          this.dropHint.style.display = 'block';
+          this.convertBtn.disabled = true;
+          this.statusText.textContent = 'idle';
+          this.statusText.className = 'status-text';
+        }
+      },
+
+      handleFileChange(e) {
+        const f = e.target.files;
+        if (f) this.setFile(f);
+      },
+
+      handleFileDrop(e) {
+        const f = e.dataTransfer.files;
+        if (f) this.setFile(f);
+      },
+
+      async runConversion() {
+        if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
+        activeConsole.innerHTML = '';
+
+        let useZip = this.currentFiles.length > 1;
+        let zip = null;
+        if (useZip) {
+          zip = new JSZip();
+        }
+
+        try {
+          const versionString = this.versionSelect.value;
+          const versionMap = {
+            'v1.00': RobloxMeshVersion.V1_00,
+            'v1.01': RobloxMeshVersion.V1_01,
+            'v2.00': RobloxMeshVersion.V2_00,
+            'v3.00': RobloxMeshVersion.V3_00,
+            'v4.00': RobloxMeshVersion.V4_00,
+            'v5.00': RobloxMeshVersion.V5_00,
+          };
+          const wasmVersion = versionMap[versionString];
+
+          this.statusText.textContent = `converting to ${versionString}...`;
+          this.statusText.className = 'status-text';
+
+          for (let i = 0; i < this.currentFiles.length; i++) {
+            const file = this.currentFiles[i];
+            if (useZip) this.statusText.textContent = `processing ${i + 1}/${this.currentFiles.length}...`;
+
+            const ab = await file.arrayBuffer();
+            const bytes = new Uint8Array(ab);
+
+            const out = convert_filemesh_version(bytes, wasmVersion);
+            const outname = file.name.replace(/(\.mesh)?$/i, `_${versionString}.mesh`);
+
+            if (useZip) {
+              zip.file(outname, out);
+            } else {
+              this.statusText.textContent = 'packaging...';
+              downloadFile(out, outname);
+            }
+          }
+
+          if (useZip) {
+            this.statusText.textContent = 'zipping...';
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            downloadFile(zipContent, "converted_mesh_versions.zip");
+          }
+
+          this.statusText.textContent = 'done!';
+          this.statusText.className = 'status-text ready';
+          setTimeout(() => {
+            if (this.statusText.textContent === 'done!') {
+              this.statusText.textContent = 'ready';
+              this.statusText.className = 'status-text ready';
+            }
+          }, 2000);
+        } catch (err) {
+          console.error('conversion error:', err);
+          this.statusText.textContent = 'error!';
+          this.statusText.className = 'status-text error';
+          alert('conversion error: ' + (err && err.message ? err.message : String(err)));
+        }
+      }
+    };
+
+    function downloadFile(data, filename) {
+      const blob = (data instanceof Blob) ? data : new Blob([data], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
-};
 
-function downloadFile(data, filename) {
-    const blob = (data instanceof Blob) ? data : new Blob([data], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-}
+    async function main() {
+      try {
+        await initWasm();
+        placeConverter.init();
+        objToMeshConverter.init();
+        meshToObjConverter.init();
+        meshVersionConverter.init();
+      } catch (err) {
+        console.error("failed to initialize wasm module:", err);
+        alert('fatal error loading core components.');
+      }
+    }
 
-async function main() {
-  try {
-    await initWasm();
-    placeConverter.init();
-    objToMeshConverter.init();
-    meshToObjConverter.init();
-    meshVersionConverter.init();
-  } catch (err) {
-    console.error("failed to initialize wasm module:", err);
-    alert('fatal error loading core components.');
-  }
-}
-
-main();
-</script>
+    main();
+  </script>
 </body>
+
 </html>
