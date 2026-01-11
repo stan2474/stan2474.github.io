@@ -273,14 +273,15 @@ export function is_binary_rbxl(bytes) {
  * @param {TerrainFormat} smooth_terrain_format
  * @param {boolean} downgrade_voxel
  * @param {TerrainFormat} voxel_target_format
+ * @param {boolean} fix_unions
  * @returns {Uint8Array}
  */
-export function fix_place(input_bytes, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format, downgrade_voxel, voxel_target_format) {
+export function fix_place(input_bytes, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, asset_url_format, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format, downgrade_voxel, voxel_target_format, fix_unions) {
     const ptr0 = passArray8ToWasm0(input_bytes, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passStringToWasm0(asset_url_format, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.fix_place(ptr0, len0, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format, downgrade_voxel, voxel_target_format);
+    const ret = wasm.fix_place(ptr0, len0, _is_xml_output_hint_this_is_never_used_anymore_due_to_auto_detection, force_xml_output, force_binary_output, folders_to_models, mappings_js, convert_assetid_to_url, ptr1, len1, convert_meshpart_to_specialmesh, smooth_to_voxel, smooth_terrain_format, downgrade_voxel, voxel_target_format, fix_unions);
     if (ret[3]) {
         throw takeFromExternrefTable0(ret[2]);
     }

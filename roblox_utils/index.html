@@ -345,7 +345,12 @@
           <option value="V3">clustergrid (version 3, recommended for 2013M+)</option>
         </select>
       </div>
-
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-fix-unions">
+          convert unions to old format <span class="experimental-tag">[experimental]</span>
+        </label>
+      </div>
 
       <hr>
 
@@ -555,6 +560,7 @@
       toggleDowngradeVoxel: document.getElementById('toggle-downgrade-voxel'),
       voxelVersionContainer: document.getElementById('voxel-version-container'),
       voxelVersionSelect: document.getElementById('voxel-version-select'),
+      toggleFixUnions: document.getElementById('toggle-fix-unions'),
       currentFile: null,
       currentFiles: [],
 
@@ -746,7 +752,7 @@
             const terrainVersion = this.terrainVersionSelect.value;
             const voxelVersion = this.voxelVersionSelect.value;
             const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
-
+            const fixUnions = this.toggleFixUnions.checked;
             const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
 
             let activeVersion = null;
@@ -789,7 +795,8 @@
               convertSmoothTerrain,
               TerrainFormat[`ClusterGrid${terrainVersion}`],
               toggleDowngradeVoxel,
-              TerrainFormat[`ClusterGrid${this.voxelVersionSelect.value}`]
+              TerrainFormat[`ClusterGrid${this.voxelVersionSelect.value}`],
+              fixUnions
             );
 
             const shouldOutputXml = (isXml && !forceBinary) || forceXml;
