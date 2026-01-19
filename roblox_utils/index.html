@@ -352,8 +352,8 @@
       </div>
       <div class="setting-item">
         <label>
-          <input type="checkbox" id="toggle-fix-unions" disabled>
-          convert unions to old format <span class="maintenance-tag">[maintenance]</span>
+          <input type="checkbox" id="toggle-fix-unions">
+          convert unions to old format <span class="experimental-tag">[experimental]</span>
         </label>
       </div>
 
@@ -757,7 +757,7 @@
             const terrainVersion = this.terrainVersionSelect.value;
             const voxelVersion = this.voxelVersionSelect.value;
             const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
-            const fixUnions = false;
+            const fixUnions = this.toggleFixUnions.checked;
             const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
 
             let activeVersion = null;
