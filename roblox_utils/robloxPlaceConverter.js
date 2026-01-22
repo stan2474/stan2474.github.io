@@ -182,10 +182,6 @@ function debugString(val) {
     return className;
 }
 
-export function start() {
-    wasm.start();
-}
-
 function passArray8ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 1, 1) >>> 0;
     getUint8ArrayMemory0().set(arg, ptr / 1);
@@ -288,6 +284,10 @@ export function fix_place(input_bytes, _is_xml_output_hint_this_is_never_used_an
     var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
     return v3;
+}
+
+export function start() {
+    wasm.start();
 }
 
 /**
