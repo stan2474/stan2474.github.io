@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>roblox::utils</title>
+  <script src="./coi-serviceworker.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     body {
@@ -151,6 +152,26 @@
       text-align: center;
     }
 
+    .rejects-header {
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.3em;
+      margin-top: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    .rejects-header h2 {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0.15em;
+    }
+
+    .section-subtitle {
+      margin-top: 0;
+      margin-bottom: 0;
+      font-size: 0.82em;
+      color: #888;
+    }
+
     .back-link {
       display: inline-block;
       margin-bottom: 1em;
@@ -218,10 +239,6 @@
     .experimental-tag {
       color: #e57373;
     }
-    
-    .maintenance-tag {
-      color: #5b3f9c;
-    }
 
     .terrain-thingy {
       display: flex;
@@ -252,18 +269,38 @@
 
       <hr>
 
+      <div class="rejects-header">
+        <h2>rejects</h2>
+        <p class="section-subtitle">utilities made for the main roblox_utils but didn't make the cut</p>
+      </div>
+      <a href="/rejects/rluauinference" style="text-decoration: none; -webkit-tap-highlight-color: transparent;">
+        <button id="goto-lightweight-cmd">roblox_place::lightweight_cmd</button>
+      </a>
+      <button id="goto-minecraft-map-converter">minecraft_map::roblox_place</button>
+      <hr>
+
       <h2>credits</h2>
       <ul>
         <li>
           <strong>legacy_place::convert</strong> uses <a href="https://github.com/rojo-rbx/rbx-dom" target="_blank"
             rel="noopener noreferrer">rbx_binary and rbx_xml</a>
-          (from rbx-dom) for roblox place file conversion and <a href="https://github.com/krakow10/rbx_mesh" target="_blank"
-            rel="noopener noreferrer">rbx-mesh</a> for converting unions to an older format.
+          (from rbx-dom) for roblox place file conversion, <a href="https://github.com/krakow10/rbx_mesh" target="_blank"
+            rel="noopener noreferrer">rbx-mesh</a> for converting unions to an older format, and <a href="https://sourceforge.net/projects/unluac/" target="_blank"
+            rel="noopener noreferrer">unluac</a> for decompiling lua scripts that loadstring bytecode.
         </li>
         <li>
           <strong>obj::to_roblox_mesh / roblox_mesh::to_obj</strong> is based on
           <a href="https://devforum.roblox.com/t/roblox-filemesh-format-specification/326114/" target="_blank"
             rel="noopener noreferrer">maximumadhd's roblox mesh file format documentation</a>.
+        </li>
+        <li>
+          <strong>roblox_place::lightweight_cmd</strong> also uses <a href="https://github.com/rojo-rbx/rbx-dom" target="_blank"
+            rel="noopener noreferrer">rbx_binary and rbx_xml</a> (from rbx-dom) to manipulate roblox place files
+        </li>
+        <li>
+          <strong>minecraft_map::roblox_place</strong> is a direct port of
+          <a href="https://github.com/Sir-Tiffy/MinecraftToRoblox/" target="_blank"
+            rel="noopener noreferrer">this</a> minecraft to roblox converter from 2013.
         </li>
       </ul>
     </div>
@@ -286,6 +323,12 @@
       <hr>
 
       <h2>settings</h2>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-remove-keyframesequences">
+          remove keyframesequences
+        </label>
+      </div>
       <div class="setting-item">
         <label>
           <input type="checkbox" id="toggle-folders">
@@ -356,6 +399,20 @@
           convert unions to old format <span class="experimental-tag">[experimental]</span>
         </label>
       </div>
+      <div class="setting-item">
+        <label>
+          <input type="checkbox" id="toggle-handle-loadstring-bytecode">
+          handle scripts that loadstring bytecode
+        </label>
+      </div>
+      <div class="setting-item terrain-thingy" id="loadstring-bytecode-method-container"
+        style="display: none; margin-left: 2em; border-left: 2px solid #333; padding-left: 1em;">
+        <label for="loadstring-bytecode-method-select">method: </label>
+        <select id="loadstring-bytecode-method-select">
+          <option value="Fione" selected>method 1: fione</option>
+          <option value="UnluacDecompilation">method 2: unluac decompilation</option>
+        </select>
+      </div>
 
       <hr>
 
@@ -417,6 +474,42 @@
       <div class="console-window">
         <div class="console-header"><span>output</span></div>
         <div id="console-obj-to-mesh" class="console" tabindex="0"></div>
+      </div>
+    </div>
+
+    <div id="page-minecraft-map-converter" style="display: none;">
+      <a href="#" class="back-link">&larr; back to home</a>
+      <h1>minecraft_map::roblox_place</h1>
+      <p>a utility to convert a zipped minecraft world into a roblox place with direct voxel terrain</p>
+
+      <div id="drop-minecraft-map" class="drop-zone" tabindex="0">
+        <p id="drop-hint-minecraft-map">drag & drop minecraft world .zip files here, or click to choose.</p>
+        <p id="filename-minecraft-map"></p>
+      </div>
+
+      <input id="fileinput-minecraft-map" type="file" accept=".zip,application/zip" multiple style="display:none" />
+      <button id="choosebtn-minecraft-map">choose files</button>
+      <button id="convertbtn-minecraft-map" disabled>convert & download</button>
+      <p id="status-minecraft-map">status: <span id="status-text-minecraft-map" class="status-text">idle</span></p>
+
+      <hr>
+
+      <h2>settings</h2>
+      <div class="setting-item">
+        <label for="minecraft-terrain-version-select">terrain version:</label>
+        <select id="minecraft-terrain-version-select">
+          <option value="V1">clustergrid (version 1, recommended for 2011L only)</option>
+          <option value="V2">clustergrid (version 2, recommended for 2012E - 2013E)</option>
+          <option value="V3" selected>clustergrid (version 3, recommended for 2013M+)</option>
+        </select>
+      </div>
+
+      <hr>
+
+      <h2>console</h2>
+      <div class="console-window">
+        <div class="console-header"><span>output</span></div>
+        <div id="console-minecraft-map" class="console" tabindex="0"></div>
       </div>
     </div>
 
@@ -491,18 +584,22 @@
   <script type="module">
     import initWasm, {
       fix_place,
+      minecraft_map_to_place,
       is_binary_rbxl,
+      init_wasm_thread_pool,
       convert_obj_to_filemesh,
       convert_filemesh_to_obj,
       convert_filemesh_version,
       RobloxMeshVersion,
-      TerrainFormat
+      TerrainFormat,
+      LoadstringBytecodeHandlingMethod
     } from './robloxPlaceConverter.js'; // this was originally gonna be just a place converter, but then I added mesh converters too
 
     atob('c3RhbiB3YXMgaGVyZQ==');
     const pages = document.querySelectorAll('.container > div');
     const backLinks = document.querySelectorAll('.back-link');
     const gotoPlaceBtn = document.getElementById('goto-place-converter');
+    const gotoMinecraftMapBtn = document.getElementById('goto-minecraft-map-converter');
     const gotoObjToMeshBtn = document.getElementById('goto-obj-to-mesh-converter');
     const gotoMeshToObjBtn = document.getElementById('goto-mesh-to-obj-converter');
     const gotoMeshVersionBtn = document.getElementById('goto-mesh-version-converter');
@@ -519,6 +616,7 @@
     }
 
     gotoPlaceBtn.addEventListener('click', () => showPage('page-place-converter'));
+    gotoMinecraftMapBtn.addEventListener('click', () => showPage('page-minecraft-map-converter'));
     gotoObjToMeshBtn.addEventListener('click', () => showPage('page-obj-to-mesh-converter'));
     gotoMeshToObjBtn.addEventListener('click', () => showPage('page-mesh-to-obj-converter'));
     gotoMeshVersionBtn.addEventListener('click', () => showPage('page-mesh-version-converter'));
@@ -542,6 +640,37 @@
     console.log = function (...a) { origConsole.log(...a); a.forEach(x => appendConsole(x)) };
     console.warn = function (...a) { origConsole.warn(...a); a.forEach(x => appendConsole(x)) };
     console.error = function (...a) { origConsole.error(...a); a.forEach(x => appendConsole(x)) };
+
+    let unluacLoadPromise = null;
+
+    async function ensureUnluacLoaded() {
+      if (typeof globalThis.decompile === 'function') {
+        return;
+      }
+
+      if (!unluacLoadPromise) {
+        unluacLoadPromise = new Promise((resolve, reject) => {
+          const existing = document.querySelector('script[data-unluac-loader="1"]');
+          if (existing) {
+            existing.addEventListener('load', () => resolve(), { once: true });
+            existing.addEventListener('error', () => reject(new Error('failed to load unluac.js')), { once: true });
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = './unluac/unluac.js';
+          script.async = true;
+          script.dataset.unluacLoader = '1';
+          script.onload = () => {
+            if (typeof globalThis.decompile === 'function') resolve();
+          };
+          script.onerror = () => reject(new Error('failed to load unluac.js'));
+          document.head.appendChild(script);
+        });
+      }
+
+      await unluacLoadPromise;
+    }
 
     const placeConverter = {
       dropHint: document.getElementById('drop-hint-place'),
@@ -570,6 +699,10 @@
       voxelVersionContainer: document.getElementById('voxel-version-container'),
       voxelVersionSelect: document.getElementById('voxel-version-select'),
       toggleFixUnions: document.getElementById('toggle-fix-unions'),
+      toggleRemoveKeyframeSequences: document.getElementById('toggle-remove-keyframesequences'),
+      toggleHandleLoadstringBytecode: document.getElementById('toggle-handle-loadstring-bytecode'),
+      loadstringBytecodeMethodContainer: document.getElementById('loadstring-bytecode-method-container'),
+      loadstringBytecodeMethodSelect: document.getElementById('loadstring-bytecode-method-select'),
       currentFile: null,
       currentFiles: [],
 
@@ -597,6 +730,9 @@
             this.terrainVersionContainer.style.display = 'none';
           }
           this.voxelVersionContainer.style.display = this.toggleDowngradeVoxel.checked ? 'block' : 'none';
+        });
+        this.toggleHandleLoadstringBytecode.addEventListener('change', () => {
+          this.loadstringBytecodeMethodContainer.style.display = this.toggleHandleLoadstringBytecode.checked ? 'block' : 'none';
         });
 
         this.addMappingBtn.addEventListener('click', () => this.addMappingRow());
@@ -762,7 +898,15 @@
             const voxelVersion = this.voxelVersionSelect.value;
             const isBinaryInput = is_binary_rbxl(bytes); // this could be done in js since function just checks first few bytes
             const fixUnions = this.toggleFixUnions.checked;
+            const removeKeyframeSequences = this.toggleRemoveKeyframeSequences.checked;
+            const handleLoadstringBytecode = this.toggleHandleLoadstringBytecode.checked;
+            const loadstringBytecodeMethodName = handleLoadstringBytecode ? this.loadstringBytecodeMethodSelect.value : 'None';
+            const loadstringBytecodeMethod = LoadstringBytecodeHandlingMethod[loadstringBytecodeMethodName];
             const willExportBinary = (isBinaryInput && !forceXml) || forceBinary;
+
+            if (handleLoadstringBytecode && loadstringBytecodeMethodName === 'UnluacDecompilation') { // this feature is gonna be used by very few (as i can only count about like 20 games that actually did this?) so its better to just load it if its being used
+              await ensureUnluacLoaded();
+            }
 
             let activeVersion = null;
             if (convertSmoothTerrain) activeVersion = terrainVersion;
@@ -791,7 +935,7 @@
             }
 
             const isXml = file.name.toLowerCase().endsWith('.rbxlx');
-            const out = fix_place(
+            const out = fix_place( // TODO: turn to json kv, we cant just have 100 function args
               bytes,
               isXml,
               forceXml,
@@ -805,7 +949,9 @@
               TerrainFormat[`ClusterGrid${terrainVersion}`],
               toggleDowngradeVoxel,
               TerrainFormat[`ClusterGrid${this.voxelVersionSelect.value}`],
-              fixUnions
+              fixUnions,
+              removeKeyframeSequences,
+              loadstringBytecodeMethod
             );
 
             const shouldOutputXml = (isXml && !forceBinary) || forceXml;
@@ -952,6 +1098,122 @@
             this.statusText.textContent = 'zipping...';
             const zipContent = await zip.generateAsync({ type: "blob" });
             downloadFile(zipContent, "converted_meshes.zip");
+          }
+
+          this.statusText.textContent = 'done!';
+          this.statusText.className = 'status-text ready';
+          setTimeout(() => {
+            if (this.statusText.textContent === 'done!') {
+              this.statusText.textContent = 'ready';
+              this.statusText.className = 'status-text ready';
+            }
+          }, 2000);
+        } catch (err) {
+          console.error('conversion error:', err);
+          this.statusText.textContent = 'error!';
+          this.statusText.className = 'status-text error';
+          alert('conversion error: ' + (err && err.message ? err.message : String(err)));
+        }
+      }
+    };
+
+    const minecraftMapConverter = {
+      dropHint: document.getElementById('drop-hint-minecraft-map'),
+      filenameEl: document.getElementById('filename-minecraft-map'),
+      drop: document.getElementById('drop-minecraft-map'),
+      chooseBtn: document.getElementById('choosebtn-minecraft-map'),
+      fileInput: document.getElementById('fileinput-minecraft-map'),
+      convertBtn: document.getElementById('convertbtn-minecraft-map'),
+      statusText: document.getElementById('status-text-minecraft-map'),
+      terrainVersionSelect: document.getElementById('minecraft-terrain-version-select'),
+      currentFile: null,
+      currentFiles: [],
+
+      init() {
+        this.drop.addEventListener('click', () => this.fileInput.click());
+        this.chooseBtn.addEventListener('click', () => this.fileInput.click());
+        this.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
+        this.drop.addEventListener('dragover', (e) => { e.preventDefault(); this.drop.classList.add('dragover'); });
+        this.drop.addEventListener('dragleave', () => this.drop.classList.remove('dragover'));
+        this.drop.addEventListener('drop', (e) => { e.preventDefault(); this.drop.classList.remove('dragover'); this.handleFileDrop(e); });
+        this.convertBtn.addEventListener('click', () => this.runConversion());
+      },
+
+      setFile(files) {
+        if (files && files.length > 0) {
+          this.currentFiles = Array.from(files);
+          this.currentFile = this.currentFiles[0];
+
+          if (this.currentFiles.length > 1) {
+            this.filenameEl.textContent = `${this.currentFiles.length} files selected`;
+          } else {
+            this.filenameEl.textContent = this.currentFile.name;
+          }
+
+          this.dropHint.style.display = 'none';
+          this.convertBtn.disabled = false;
+          this.statusText.textContent = 'ready';
+          this.statusText.className = 'status-text ready';
+        } else {
+          this.currentFiles = [];
+          this.currentFile = null;
+          this.filenameEl.textContent = '';
+          this.dropHint.style.display = 'block';
+          this.convertBtn.disabled = true;
+          this.statusText.textContent = 'idle';
+          this.statusText.className = 'status-text';
+        }
+      },
+
+      handleFileChange(e) {
+        const f = e.target.files;
+        if (f) this.setFile(f);
+      },
+
+      handleFileDrop(e) {
+        const f = e.dataTransfer.files;
+        if (f) this.setFile(f);
+      },
+
+      async runConversion() {
+        if (!this.currentFiles || this.currentFiles.length === 0) { alert('please select a file first'); return; }
+        activeConsole.innerHTML = '';
+
+        let useZip = this.currentFiles.length > 1;
+        let zip = null;
+        if (useZip) {
+          zip = new JSZip();
+        }
+
+        try {
+          this.statusText.textContent = 'processing...';
+          this.statusText.className = 'status-text';
+
+          const terrainVersion = this.terrainVersionSelect.value;
+          const terrainFormat = TerrainFormat[`ClusterGrid${terrainVersion}`];
+
+          for (let i = 0; i < this.currentFiles.length; i++) {
+            const file = this.currentFiles[i];
+            if (useZip) this.statusText.textContent = `processing ${i + 1}/${this.currentFiles.length}...`;
+
+            const ab = await file.arrayBuffer();
+            const bytes = new Uint8Array(ab);
+            const out = minecraft_map_to_place(bytes, terrainFormat);
+            const ext = terrainVersion === 'V3' ? '.rbxl' : '.rbxlx';
+            const outname = file.name.replace(/\.zip$/i, '') + `_minecraft${ext}`;
+
+            if (useZip) {
+              zip.file(outname, out);
+            } else {
+              this.statusText.textContent = 'packaging...';
+              downloadFile(out, outname);
+            }
+          }
+
+          if (useZip) {
+            this.statusText.textContent = 'zipping...';
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            downloadFile(zipContent, "converted_minecraft_places.zip");
           }
 
           this.statusText.textContent = 'done!';
@@ -1221,10 +1483,18 @@
       URL.revokeObjectURL(url);
     }
 
+    async function initWasmThreads() {
+      const hardwareThreads = navigator.hardwareConcurrency || 4;
+      const threadCount = Math.max(1, Math.min(hardwareThreads, 8));
+      await init_wasm_thread_pool(threadCount);
+    }
+
     async function main() {
       try {
         await initWasm();
+        await initWasmThreads();
         placeConverter.init();
+        minecraftMapConverter.init();
         objToMeshConverter.init();
         meshToObjConverter.init();
         meshVersionConverter.init();

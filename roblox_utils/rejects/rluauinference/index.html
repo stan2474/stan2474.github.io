@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<!-- originally made for the release of roblox_utils in late 2025 and as a standalone program (hence the codename: rluauinference), did not make the cut as it didn't fit the other tools !-->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>roblox_place::lightweight_cmd</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+  <style>
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #121212;
+      color: #e0e0e0;
+      line-height: 1.6;
+      margin: 0;
+      padding: 2em;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    h1,
+    h2 {
+      font-weight: normal;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.3em;
+      margin-top: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    p {
+      margin-top: 0;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+
+    .drop-zone {
+      border: 2px dashed #444;
+      padding: 3em;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 1em;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .drop-zone.dragover {
+      border-color: #888;
+      background-color: #1a1a1a;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 1em;
+      padding: 0.5em 1em;
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      cursor: pointer;
+      margin-right: 0.5em;
+      margin-top: 0.5em;
+    }
+
+    button:hover {
+      background-color: #333;
+      border-color: #777;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #2a2a2a;
+      border-color: #555;
+    }
+
+    .status-text.ready {
+      color: #81c784;
+    }
+
+    .status-text.error {
+      color: #e57373;
+    }
+
+    .status-text.busy {
+      color: #90caf9;
+    }
+
+    .console-window,
+    .panel-window {
+      background-color: #0d0d0d;
+      border: 1px solid #444;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .console-header {
+      background-color: #2a2a2a;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      color: #aaa;
+      border-bottom: 1px solid #444;
+      text-transform: lowercase;
+    }
+
+    .console {
+      width: 100%;
+      box-sizing: border-box;
+      height: 40vh;
+      min-height: 0;
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      color: #ccc;
+      padding: 0.75em;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .editor {
+      width: 100%;
+      min-height: 520px;
+      height: 72vh;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      align-items: start;
+      gap: 1em;
+    }
+
+    .side-panels {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 1em;
+      min-height: 0;
+    }
+
+    .session-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1em;
+      margin-bottom: 1em;
+    }
+
+    .session-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .meta {
+      color: #999;
+      margin-bottom: 0.5em;
+    }
+
+    .note {
+      color: #aaa;
+      font-size: 0.95em;
+    }
+
+    .log-entry {
+      margin-bottom: 0.45em;
+    }
+
+    .log-entry.print {
+      color: #e0e0e0;
+    }
+
+    .log-entry.warn {
+      color: #ffcc80;
+    }
+
+    .log-entry.error {
+      color: #ef9a9a;
+    }
+
+    .log-entry.result {
+      color: #81c784;
+    }
+
+    .log-entry.info {
+      color: #90caf9;
+    }
+
+    .run-list {
+      padding: 0.75em;
+      min-height: 84px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .run-empty {
+      color: #888;
+    }
+
+    .run-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75em;
+      padding: 0.4em 0;
+      border-bottom: 1px solid #222;
+    }
+
+    .run-row:last-child {
+      border-bottom: none;
+    }
+
+    .run-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15em;
+    }
+
+    .run-label {
+      color: #ddd;
+      word-break: break-word;
+    }
+
+    .run-age {
+      color: #888;
+      font-size: 0.85em;
+    }
+
+    .run-stop-btn {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    a {
+      color: #aaccff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 1em;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .session-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .session-actions {
+        justify-content: flex-start;
+      }
+
+      .editor,
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #4a4a4a #1a1a1a;
+    }
+
+    *::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background: #4a4a4a;
+      border-radius: 5px;
+      border: 2px solid #1a1a1a;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: #5a5a5a;
+    }
+
+    .console {
+        min-height: 360px;
+        height: 52vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="page-home">
+      <a href="/" class="back-link">← back to home</a>
+      <h1>roblox_place::lightweight_cmd</h1>
+      <p>a utility to use a lightweight roblox luau environment to interact with a place inside your browser</p>
+
+      <div id="drop-session" class="drop-zone" tabindex="0">
+        <p id="drop-hint-session">drag & drop .rbxl, .rbxlx, .rbxm, or .rbxmx here, or click to choose.</p>
+        <p id="filename-session"></p>
+      </div>
+
+      <input id="fileinput-session" type="file" accept=".rbxl,.rbxlx,.rbxm,.rbxmx" style="display:none" />
+      <button id="choosebtn-session">choose file</button>
+      <button id="startbtn-session" disabled>start session</button>
+      <p>status: <span id="status-text-home" class="status-text">idle</span></p>
+      <hr>
+      <h2>note</h2>
+      <p class="note">this project does not have everything that the roblox environment has (hence why it is called a lightweight environment). the environment is also made to resemble/replicate the roblox command bar's environment</p>
+
+      <div id="last-download-panel" class="hidden">
+        <hr>
+        <h2>last session download</h2>
+        <p id="last-download-name" class="meta"></p>
+        <button id="download-last-btn">download current place</button>
+      </div>
+    </div>
+
+    <div id="page-session" class="hidden">
+      <div class="session-header">
+        <div>
+          <h1>roblox_place::lightweight_cmd</h1>
+          <p id="session-file-name" class="meta"></p>
+        </div>
+
+        <div class="session-actions">
+          <button id="runbtn-session">run (ctrl+enter)</button>
+          <button id="downloadbtn-session">download current place</button>
+          <button id="endsessionbtn-session">end session</button>
+        </div>
+      </div>
+
+      <p>status: <span id="status-text-session" class="status-text">ready</span></p>
+
+      <div class="workspace">
+        <div class="panel-window">
+          <div class="console-header"><span>editor</span></div>
+          <div id="editor-session" class="editor"></div>
+        </div>
+
+        <div class="side-panels">
+          <div class="console-window">
+            <div class="console-header"><span>output</span></div>
+            <div id="console-session" class="console" tabindex="0"></div>
+          </div>
+
+          <div class="panel-window">
+            <div class="console-header"><span>running</span></div>
+            <div id="running-session" class="run-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import init_wasm from "./rluauinference.js";
+
+    const page_home = document.getElementById("page-home");
+    const page_session = document.getElementById("page-session");
+    const drop_session = document.getElementById("drop-session");
+    const drop_hint_session = document.getElementById("drop-hint-session");
+    const fileinput_session = document.getElementById("fileinput-session");
+    const choosebtn_session = document.getElementById("choosebtn-session");
+    const startbtn_session = document.getElementById("startbtn-session");
+    const filename_session = document.getElementById("filename-session");
+    const status_text_home = document.getElementById("status-text-home");
+    const status_text_session = document.getElementById("status-text-session");
+    const session_file_name = document.getElementById("session-file-name");
+    const runbtn_session = document.getElementById("runbtn-session");
+    const downloadbtn_session = document.getElementById("downloadbtn-session");
+    const endsessionbtn_session = document.getElementById("endsessionbtn-session");
+    const console_session = document.getElementById("console-session");
+    const running_session = document.getElementById("running-session");
+    const last_download_panel = document.getElementById("last-download-panel");
+    const last_download_name = document.getElementById("last-download-name");
+    const download_last_btn = document.getElementById("download-last-btn");
+
+    const state = {
+      wasm: null,
+      selected_file: null,
+      session: null,
+      editor: null,
+      last_download: null,
+      running_runs: [],
+      running_rows: new Map(),
+      stopping_run_ids: new Set(),
+      pending_runs_render: null,
+      pending_runs_frame: 0,
+      running_clock_timer: 0,
+      output_unsubscribe: null,
+      run_unsubscribe: null,
+      monaco: null,
+      monaco_ready: null
+    };
+
+    function now_ms() {
+      if (typeof performance !== "undefined" && typeof performance.now === "function") {
+        return performance.now();
+      }
+
+      return Date.now();
+    }
+
+    function show_page(page) {
+      page_home.classList.toggle("hidden", page !== "home");
+      page_session.classList.toggle("hidden", page !== "session");
+      if (page === "session") {
+        requestAnimationFrame(() => state.editor?.layout());
+      }
+    }
+
+    function set_status(element, text, kind = "") {
+      element.textContent = text;
+      element.className = kind ? `status-text ${kind}` : "status-text";
+    }
+
+    function set_session_controls_disabled(disabled) {
+      runbtn_session.disabled = disabled;
+      downloadbtn_session.disabled = disabled;
+      endsessionbtn_session.disabled = disabled;
+    }
+
+    function set_selected_file(file) {
+      state.selected_file = file || null;
+
+      if (!state.selected_file) {
+        filename_session.textContent = "";
+        drop_hint_session.style.display = "block";
+        startbtn_session.disabled = true;
+        set_status(status_text_home, "idle");
+        return;
+      }
+
+      filename_session.textContent = state.selected_file.name;
+      drop_hint_session.style.display = "none";
+      startbtn_session.disabled = false;
+      set_status(status_text_home, "ready", "ready");
+    }
+
+    function append_output(kind, message) {
+      const entry = document.createElement("div");
+      const resolved_kind = kind || "info";
+      entry.className = `log-entry ${resolved_kind}`;
+
+      if (resolved_kind === "warn") {
+        entry.textContent = `warn: ${message}`;
+      } else if (resolved_kind === "error") {
+        entry.textContent = message;
+      } else if (resolved_kind === "result") {
+        entry.textContent = `= ${message}`;
+      } else if (resolved_kind === "info") {
+        entry.textContent = `info: ${message}`;
+      } else {
+        entry.textContent = message;
+      }
+
+      console_session.appendChild(entry);
+      console_session.scrollTop = console_session.scrollHeight;
+    }
+
+    function clear_output() {
+      console_session.innerHTML = "";
+    }
+
+    function schedule_running_runs_render(runs = state.running_runs) {
+      const runs_changed = Array.isArray(runs) && runs !== state.running_runs;
+
+      if (runs_changed) {
+        const received_at_ms = now_ms();
+        state.pending_runs_render = runs.map((run) => ({
+          ...run,
+          client_received_at_ms: received_at_ms
+        }));
+      } else if (!state.pending_runs_render) {
+        state.pending_runs_render = Array.isArray(runs) ? runs : [];
+      }
+
+      if (state.pending_runs_frame) {
+        return;
+      }
+
+      state.pending_runs_frame = requestAnimationFrame(() => {
+        state.pending_runs_frame = 0;
+        render_running_runs(state.pending_runs_render);
+      });
+    }
+
+    function sync_running_clock() {
+      if (state.running_runs.length > 0) {
+        if (!state.running_clock_timer) {
+          state.running_clock_timer = window.setInterval(() => {
+            if (state.running_runs.length === 0) {
+              clearInterval(state.running_clock_timer);
+              state.running_clock_timer = 0;
+              return;
+            }
+
+            schedule_running_runs_render();
+          }, 100);
+        }
+
+        return;
+      }
+
+      if (state.running_clock_timer) {
+        clearInterval(state.running_clock_timer);
+        state.running_clock_timer = 0;
+      }
+    }
+
+    function create_run_row(run_id) {
+      const row = document.createElement("div");
+      row.className = "run-row";
+
+      const info = document.createElement("div");
+      info.className = "run-info";
+
+      const label = document.createElement("div");
+      label.className = "run-label";
+
+      const age_label = document.createElement("div");
+      age_label.className = "run-age";
+
+      info.appendChild(label);
+      info.appendChild(age_label);
+
+      const stop_button = document.createElement("button");
+      stop_button.className = "run-stop-btn";
+      stop_button.textContent = "stop";
+      stop_button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        stop_run(run_id);
+      });
+
+      row.appendChild(info);
+      row.appendChild(stop_button);
+      return { row, label, age_label, stop_button };
+    }
+
+    function render_running_runs(runs = state.running_runs) {
+      state.running_runs = Array.isArray(runs) ? runs : [];
+      sync_running_clock();
+
+      if (state.running_runs.length === 0) {
+        state.running_rows.clear();
+        running_session.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "run-empty";
+        empty.textContent = "no running scripts";
+        running_session.appendChild(empty);
+        return;
+      }
+
+      const next_ids = new Set(state.running_runs.map((run) => run.id));
+      for (const [run_id, elements] of state.running_rows.entries()) {
+        if (!next_ids.has(run_id)) {
+          elements.row.remove();
+          state.running_rows.delete(run_id);
+          state.stopping_run_ids.delete(run_id);
+        }
+      }
+
+      running_session.innerHTML = "";
+      const fragment = document.createDocumentFragment();
+
+      for (const run of state.running_runs) {
+        let elements = state.running_rows.get(run.id);
+        if (!elements) {
+          elements = create_run_row(run.id);
+          state.running_rows.set(run.id, elements);
+        }
+
+        const base_age_ms = Number(run?.age_ms || 0);
+        const received_at_ms = Number(run?.client_received_at_ms || 0);
+        const live_age_ms = received_at_ms > 0
+          ? base_age_ms + Math.max(0, now_ms() - received_at_ms)
+          : base_age_ms;
+        const age_seconds = live_age_ms / 1000;
+         elements.label.textContent = `thread #${run.id}`;
+         elements.age_label.textContent = `${age_seconds.toFixed(1)}s`;
+        elements.stop_button.disabled = !state.session || state.stopping_run_ids.has(run.id);
+        elements.stop_button.textContent = state.stopping_run_ids.has(run.id) ? "stopping..." : "stop";
+        fragment.appendChild(elements.row);
+      }
+
+      running_session.appendChild(fragment);
+    }
+
+    function download_bytes(bytes, filename) {
+      const blob = new Blob([bytes], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(url);
+    }
+
+    function render_last_download() {
+      if (!state.last_download) {
+        last_download_panel.classList.add("hidden");
+        return;
+      }
+
+      last_download_name.textContent = state.last_download.name;
+      last_download_panel.classList.remove("hidden");
+    }
+
+    async function ensure_monaco() {
+      if (state.monaco_ready) {
+        return state.monaco_ready;
+      }
+
+      state.monaco_ready = new Promise((resolve, reject) => {
+        if (window.monaco?.editor) {
+          resolve(window.monaco);
+          return;
+        }
+
+        if (typeof window.require !== "function") {
+          reject(new Error("monaco loader is unavailable"));
+          return;
+        }
+
+        window.require.config({
+          paths: {
+            vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs"
+          }
+        });
+
+        window.require(["vs/editor/editor.main"], () => {
+          resolve(window.monaco);
+        }, reject);
+      });
+
+      return state.monaco_ready;
+    }
+
+    async function ensure_editor() {
+      if (state.editor) {
+        return state.editor;
+      }
+
+      state.monaco = await ensure_monaco();
+      state.editor = state.monaco.editor.create(document.getElementById("editor-session"), {
+        value: "-- ctrl+enter to run\nprint(game.Name)\n",
+        language: "lua",
+        theme: "vs-dark",
+        automaticLayout: true,
+        minimap: { enabled: false },
+        wordWrap: "on",
+        fontFamily: "Courier New, monospace",
+        fontSize: 14,
+        smoothScrolling: true,
+        scrollBeyondLastLine: false
+      });
+
+      state.editor.addCommand(
+        state.monaco.KeyMod.CtrlCmd | state.monaco.KeyCode.Enter,
+        () => {
+          run_session_code();
+        }
+      );
+
+      window.addEventListener("resize", () => state.editor?.layout());
+      return state.editor;
+    }
+
+    async function ensure_wasm() {
+      if (!state.wasm) {
+        state.wasm = await init_wasm();
+      }
+
+      return state.wasm;
+    }
+
+    async function save_session_snapshot() {
+      if (!state.session) {
+        return null;
+      }
+
+      const bytes = await state.session.save_current_place();
+      const name = await state.session.output_name();
+      state.last_download = { bytes, name };
+      render_last_download();
+      return state.last_download;
+    }
+
+    async function start_session() {
+      if (!state.selected_file) {
+        alert("please choose a place or model file first.");
+        return;
+      }
+
+      set_status(status_text_home, "starting session...", "busy");
+      startbtn_session.disabled = true;
+
+      try {
+        const wasm = await ensure_wasm();
+        const bytes = new Uint8Array(await state.selected_file.arrayBuffer());
+        state.session = await wasm.RobloxLightweightCmdSession.create(bytes, state.selected_file.name);
+        state.output_unsubscribe?.();
+        state.run_unsubscribe?.();
+        state.output_unsubscribe = state.session.onOutput((entries) => {
+          for (const entry of entries) {
+            append_output(entry.kind, entry.message);
+          }
+        });
+        state.run_unsubscribe = state.session.onRuns((runs) => {
+          schedule_running_runs_render(runs);
+        });
+
+        await ensure_editor();
+        state.editor.setValue("-- ctrl+enter to run\nprint(game.Name)\n");
+        session_file_name.textContent = state.selected_file.name;
+        clear_output();
+        schedule_running_runs_render([]);
+        set_session_controls_disabled(false);
+        append_output("info", `session started for ${state.selected_file.name}`);
+        set_status(status_text_session, "ready", "ready");
+        show_page("session");
+      } catch (error) {
+        set_status(status_text_home, "error", "error");
+        alert(error.message || String(error));
+      } finally {
+        startbtn_session.disabled = !state.selected_file;
+      }
+    }
+
+    async function run_session_code() {
+      if (!state.session || !state.editor) {
+        return;
+      }
+
+      try {
+        const response = await state.session.eval(state.editor.getValue());
+        const entries = Array.isArray(response?.entries) ? response.entries : [];
+
+        for (const entry of entries) {
+          append_output(entry.kind, entry.message);
+        }
+
+        set_status(status_text_session, "ready", "ready");
+      } catch (error) {
+        append_output("error", error.message || String(error));
+        set_status(status_text_session, "error", "error");
+      }
+    }
+
+    async function stop_run(run_id) {
+      if (!state.session) {
+        return;
+      }
+
+      state.stopping_run_ids.add(run_id);
+      schedule_running_runs_render();
+
+      try {
+        await state.session.stopRun(run_id);
+        state.stopping_run_ids.delete(run_id);
+      } catch (error) {
+        state.stopping_run_ids.delete(run_id);
+        schedule_running_runs_render();
+        append_output("error", error.message || String(error));
+        set_status(status_text_session, "error", "error");
+      }
+    }
+
+    async function download_current_place() {
+      if (!state.session) {
+        return;
+      }
+
+      set_status(status_text_session, "packaging...", "busy");
+
+      try {
+        const snapshot = await save_session_snapshot();
+        download_bytes(snapshot.bytes, snapshot.name);
+        append_output("info", `downloaded ${snapshot.name}`);
+        set_status(status_text_session, "ready", "ready");
+      } catch (error) {
+        append_output("error", error.message || String(error));
+        set_status(status_text_session, "error", "error");
+      }
+    }
+
+    async function end_session() {
+      if (!state.session) {
+        return;
+      }
+
+      const confirmed = confirm("are you sure you want to end this session? download the current place first if you want to keep your changes.");
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await save_session_snapshot();
+      } catch (error) {
+        append_output("warn", `failed to capture final snapshot: ${error.message || String(error)}`);
+      }
+
+      try {
+        await state.session.free();
+      } catch (error) {
+        alert(error.message || String(error));
+      }
+
+      state.output_unsubscribe?.();
+      state.output_unsubscribe = null;
+      state.run_unsubscribe?.();
+      state.run_unsubscribe = null;
+      state.session = null;
+      state.stopping_run_ids.clear();
+      schedule_running_runs_render([]);
+      set_session_controls_disabled(true);
+      show_page("home");
+      render_last_download();
+      set_status(status_text_home, state.selected_file ? "ready" : "idle", state.selected_file ? "ready" : "");
+    }
+
+    drop_session.addEventListener("click", () => fileinput_session.click());
+    choosebtn_session.addEventListener("click", () => fileinput_session.click());
+    fileinput_session.addEventListener("change", (event) => {
+      const file = event.target.files?.[0] || null;
+      set_selected_file(file);
+    });
+    drop_session.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      drop_session.classList.add("dragover");
+    });
+    drop_session.addEventListener("dragleave", () => {
+      drop_session.classList.remove("dragover");
+    });
+    drop_session.addEventListener("drop", (event) => {
+      event.preventDefault();
+      drop_session.classList.remove("dragover");
+      set_selected_file(event.dataTransfer.files?.[0] || null);
+    });
+    startbtn_session.addEventListener("click", () => start_session());
+    runbtn_session.addEventListener("click", () => run_session_code());
+    downloadbtn_session.addEventListener("click", () => download_current_place());
+    endsessionbtn_session.addEventListener("click", () => end_session());
+    download_last_btn.addEventListener("click", () => {
+      if (!state.last_download) {
+        return;
+      }
+
+      download_bytes(state.last_download.bytes, state.last_download.name);
+    });
+
+    show_page("home");
+    render_last_download();
+    schedule_running_runs_render([]);
+  </script>
+</body>
+
+</html>
