@@ -5,7 +5,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>roblox::utils</title>
-  <script src="./coi-serviceworker.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     body {
@@ -586,7 +585,6 @@
       fix_place,
       minecraft_map_to_place,
       is_binary_rbxl,
-      init_wasm_thread_pool,
       convert_obj_to_filemesh,
       convert_filemesh_to_obj,
       convert_filemesh_version,
@@ -1483,16 +1481,9 @@
       URL.revokeObjectURL(url);
     }
 
-    async function initWasmThreads() {
-      const hardwareThreads = navigator.hardwareConcurrency || 4;
-      const threadCount = Math.max(1, Math.min(hardwareThreads, 8));
-      await init_wasm_thread_pool(threadCount);
-    }
-
     async function main() {
       try {
         await initWasm();
-        await initWasmThreads();
         placeConverter.init();
         minecraftMapConverter.init();
         objToMeshConverter.init();
